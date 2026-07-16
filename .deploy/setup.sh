@@ -51,7 +51,7 @@ if [ -d "$APP_ROOT" ]; then
     echo "Directory exists, pulling updates..."
     cd "$APP_ROOT" && git pull origin main
 else
-    git clone https://github.com/YOUR_USER/forgedesk.git "$APP_ROOT"
+    git clone https://github.com/NosaibaWebDev/forgedesk.git "$APP_ROOT"
 fi
 
 # --------- Step 4: Permissions ---------

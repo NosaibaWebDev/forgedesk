@@ -8,7 +8,7 @@ Freelancer Web Developer Business Management System — Laravel 12, RTL/Hebrew-f
 
 ```bash
 # On your VPS as root:
-curl -O https://raw.githubusercontent.com/YOUR_USER/forgedesk/main/.deploy/setup.sh
+curl -O https://raw.githubusercontent.com/NosaibaWebDev/forgedesk/main/.deploy/setup.sh
 bash setup.sh your-domain.com
 ```
 
