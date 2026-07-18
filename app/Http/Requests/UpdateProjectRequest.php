@@ -25,7 +25,11 @@ class UpdateProjectRequest extends FormRequest
             'estimated_hours' => 'nullable|numeric|min:0',
             'paid_amount' => 'nullable|numeric|min:0',
             'start_date' => 'nullable|date',
-            'due_date' => 'nullable|date|after_or_equal:start_date',
+            'due_date' => ['nullable', 'date', function ($attr, $value, $fail) {
+                if ($value && $this->start_date && $value < $this->start_date) {
+                    $fail(__('validation.after_or_equal', ['attribute' => __('due_date'), 'date' => $this->start_date]));
+                }
+            }],
             'completed_at' => 'nullable|date',
             'notes' => 'nullable|string',
         ];
