@@ -34,7 +34,6 @@ php artisan key:generate
 # Edit .env with your database credentials
 php artisan migrate
 php artisan db:seed
-php artisan app:create-admin
 
 # For production
 php artisan config:cache
@@ -43,6 +42,17 @@ php artisan view:cache
 ```
 
 **Requirements:** PHP 8.2 or later, Composer, MySQL 8+ or SQLite
+
+## Default Credentials
+
+After running `php artisan db:seed`, you can log in with:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@forgedesk.dev | admin123456 |
+| Client | client@forgedesk.dev | client123456 |
+
+**Change these immediately after first login.**
 
 ---
 
