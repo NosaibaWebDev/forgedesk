@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,13 +20,13 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $adminPassword = Str::random(16);
-        $clientPassword = Str::random(16);
+        $adminPassword = 'admin123456';
+        $clientPassword = 'client123456';
 
-        $this->command?->warn('=== DEMO CREDENTIALS (save these!) ===');
-        $this->command?->warn("Admin: admin@forgedesk.dev / $adminPassword");
-        $this->command?->warn("Client: client@forgedesk.dev / $clientPassword");
-        $this->command?->warn('========================================');
+        $this->command?->warn('=== DEFAULT CREDENTIALS (change after first login!) ===');
+        $this->command?->warn("Admin: admin@forgedesk.dev / admin123456");
+        $this->command?->warn("Client: client@forgedesk.dev / client123456");
+        $this->command?->warn('=====================================================');
 
         $admin = User::create([
             'name' => 'מנהל המערכת',
