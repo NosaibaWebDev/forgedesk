@@ -76,15 +76,15 @@ Route::post('/reset-password', function (\Illuminate\Http\Request $request) {
     return $status === Password::PASSWORD_RESET
         ? redirect()->route('login')->with('status', __($status))
         : back()->withErrors(['email' => __($status)]);
-})->name('password.update');
+})->middleware('throttle:login')->name('password.update');
 
-Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch')->middleware('throttle:api');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:api');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update')->middleware('throttle:api');
+    Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy')->middleware('throttle:api');
 
     Route::get('/confirm-password', function () {
         return view('auth.confirm-password');
@@ -92,10 +92,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/confirm-password', function (\Illuminate\Http\Request $request) {
         if (!\Illuminate\Support\Facades\Hash::check($request->password, $request->user()->password)) {
-            return back()->withErrors(['password' => 'הסיסמה אינה נכונה.']);
+            return back()->withErrors(['password' => __('auth.password_incorrect')]);
         }
         $request->session()->put('auth.password_confirmed_at', time());
-        return redirect()->intended('back');
+        return redirect()->back();
     });
 
     Route::get('files/{file}/download', [FileDownloadController::class, 'projectFile'])
@@ -138,7 +138,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('messages', [AdminMessageController::class, 'index'])->name('messages.index');
     Route::get('messages/{project}', [AdminMessageController::class, 'show'])->name('messages.show');
-    Route::post('messages/{project}', [AdminMessageController::class, 'store'])->name('messages.store');
+    Route::post('messages/{project}', [AdminMessageController::class, 'store'])->name('messages.store')->middleware('throttle:api');
 
     Route::get('projects-export/csv', [AdminProjectController::class, 'exportCsv'])->name('projects.export.csv')->middleware('throttle:exports');
     Route::get('projects-export/pdf', [AdminProjectController::class, 'exportPdf'])->name('projects.export.pdf')->middleware('throttle:exports');
@@ -148,12 +148,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('timetracker', [AdminTimeTrackerController::class, 'index'])->name('timetracker.index');
     Route::get('timetracker/export/csv', [AdminTimeTrackerController::class, 'exportCsv'])->name('timetracker.export.csv')->middleware('throttle:exports');
     Route::get('timetracker/export/pdf', [AdminTimeTrackerController::class, 'exportPdf'])->name('timetracker.export.pdf')->middleware('throttle:exports');
-    Route::post('timetracker/start', [AdminTimeTrackerController::class, 'start'])->name('timetracker.start');
-    Route::post('timetracker/{entry}/stop', [AdminTimeTrackerController::class, 'stop'])->name('timetracker.stop');
-    Route::delete('timetracker/{entry}', [AdminTimeTrackerController::class, 'destroy'])->name('timetracker.destroy');
-    Route::post('timetracker', [AdminTimeTrackerController::class, 'store'])->name('timetracker.store');
+    Route::post('timetracker/start', [AdminTimeTrackerController::class, 'start'])->name('timetracker.start')->middleware('throttle:api');
+    Route::post('timetracker/{entry}/stop', [AdminTimeTrackerController::class, 'stop'])->name('timetracker.stop')->middleware('throttle:api');
+    Route::delete('timetracker/{entry}', [AdminTimeTrackerController::class, 'destroy'])->name('timetracker.destroy')->middleware('throttle:api');
+    Route::post('timetracker', [AdminTimeTrackerController::class, 'store'])->name('timetracker.store')->middleware('throttle:api');
     Route::get('timetracker/{entry}/edit', [AdminTimeTrackerController::class, 'edit'])->name('timetracker.edit');
-    Route::put('timetracker/{entry}', [AdminTimeTrackerController::class, 'update'])->name('timetracker.update');
+    Route::put('timetracker/{entry}', [AdminTimeTrackerController::class, 'update'])->name('timetracker.update')->middleware('throttle:api');
     Route::get('api/projects/{projectId}/tasks', [AdminTimeTrackerController::class, 'getTasks'])->name('api.tasks')->middleware('throttle:api');
 
     Route::put('api/projects/{project}/status', [AdminProjectController::class, 'updateStatus'])->name('api.projects.update-status')->middleware('throttle:api');
@@ -177,7 +177,7 @@ Route::middleware(['auth', 'client'])->prefix('client')->name('client.')->group(
 
     Route::get('messages', [ClientMessageController::class, 'index'])->name('messages.index');
     Route::get('messages/{project}', [ClientMessageController::class, 'show'])->name('messages.show');
-    Route::post('messages/{project}', [ClientMessageController::class, 'store'])->name('messages.store');
+    Route::post('messages/{project}', [ClientMessageController::class, 'store'])->name('messages.store')->middleware('throttle:api');
 
     Route::get('projects-export/csv', [ClientProjectController::class, 'exportCsv'])->name('projects.export.csv')->middleware('throttle:exports');
     Route::get('projects/{project}/export/csv', [ClientProjectController::class, 'exportProjectCsv'])->name('projects.export.project.csv')->middleware('throttle:exports');

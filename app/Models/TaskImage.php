@@ -36,7 +36,8 @@ class TaskImage extends Model
         return URL::temporarySignedRoute(
             'file.download.task-image',
             now()->addHours(2),
-            ['image' => $this->id]
+            ['image' => $this->id],
+            false
         );
     }
 

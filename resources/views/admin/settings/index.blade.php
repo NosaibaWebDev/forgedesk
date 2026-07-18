@@ -12,7 +12,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto">
     {{-- App Settings --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6 mb-6">
         <h3 class="text-lg font-semibold text-ink mb-4">{{ __('app_settings') }}</h3>
         <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
             @csrf
@@ -30,7 +30,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <label class="label">{{ __('app_logo') }}</label>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         @if($settings['app_logo'])
                             <div class="flex items-center gap-3">
                                 <img src="{{ Storage::disk('public')->url($settings['app_logo']) }}" alt="{{ __('logo_alt') }}" width="64" height="64" class="h-16 w-16 object-contain rounded-card border border-border">
@@ -74,7 +74,7 @@
     </div>
 
     {{-- Company Settings --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6 mb-6">
         <h3 class="text-lg font-semibold text-ink mb-4">{{ __('company_details') }}</h3>
         <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
             @csrf

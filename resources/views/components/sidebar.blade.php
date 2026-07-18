@@ -5,8 +5,8 @@
 
 <aside id="sidebar" class="fixed inset-y-0 right-0 z-50 flex flex-col transition-colors" style="background:var(--color-bg); border-left:1px solid var(--color-border);">
 
-    <div class="h-16 flex items-center px-5 border-b flex-shrink-0 transition-colors" style="border-color:var(--color-border);">
-        <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('client.dashboard') }}" class="flex items-center gap-2.5">
+    <div class="h-16 flex items-center justify-between px-5 border-b flex-shrink-0 transition-colors" style="border-color:var(--color-border);">
+        <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('client.dashboard') }}" class="flex items-center gap-2.5 min-w-0">
             @if($appLogo && \Illuminate\Support\Facades\Storage::disk('public')->exists($appLogo))
                 <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($appLogo) }}" alt="Logo" width="32" height="32" class="h-8 w-8 object-contain rounded flex-shrink-0">
             @else
@@ -14,6 +14,9 @@
             @endif
             <span class="sidebar-brand-text text-[15px] font-bold" style="color:var(--color-ink);">{{ $appName }}</span>
         </a>
+        <button onclick="toggleSidebar()" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-btn text-ink-muted hover:bg-gray-100 dark:hover:bg-gray-700 transition flex-shrink-0" aria-label="{{ __('close_menu') }}">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
     </div>
 
     <nav class="flex-1 mt-5 px-3 space-y-0.5 overflow-y-auto">
@@ -35,7 +38,7 @@
                 <span class="nav-label">{{ __('messages') }}</span>
                 @php $unread = auth()->user()->unreadMessagesCount(); @endphp
                 @if($unread > 0)
-                    <span class="nav-badge mr-auto bg-danger text-white text-[11px] font-medium rounded-badge px-2 py-0.5 leading-none">{{ $unread }}</span>
+                    <span class="nav-badge ms-auto bg-danger text-white text-[11px] font-medium rounded-badge px-2 py-0.5 leading-none">{{ $unread }}</span>
                 @endif
             </a>
             <a href="{{ route('admin.timetracker.index') }}" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm transition {{ request()->routeIs('admin.timetracker.*') ? 'nav-item-active' : '' }}" style="color:var(--color-ink-secondary);">
@@ -61,16 +64,16 @@
                 <span class="nav-label">{{ __('messages') }}</span>
                 @php $unread = auth()->user()->unreadMessagesCount(); @endphp
                 @if($unread > 0)
-                    <span class="nav-badge mr-auto bg-danger text-white text-[11px] font-medium rounded-badge px-2 py-0.5 leading-none">{{ $unread }}</span>
+                    <span class="nav-badge ms-auto bg-danger text-white text-[11px] font-medium rounded-badge px-2 py-0.5 leading-none">{{ $unread }}</span>
                 @endif
             </a>
         @endif
             <div class="my-3 mx-2 border-b" style="border-color:var(--color-border);"></div>
-            <button onclick="event.stopPropagation(); toggleSidebarCollapse()" class="toggle-sidebar-btn nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm transition hidden lg:flex text-right" style="color:var(--color-ink-secondary);">
+            <button onclick="event.stopPropagation(); toggleSidebarCollapse()" class="toggle-sidebar-btn nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm transition hidden md:flex text-right" style="color:var(--color-ink-secondary);">
                 <i data-lucide="panel-right-close" class="w-5 h-5 flex-shrink-0"></i>
                 <span class="nav-label">{{ __('collapse_menu') }}</span>
             </button>
-            <button onclick="event.stopPropagation(); toggleTheme()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm transition hidden lg:flex text-right" style="color:var(--color-ink-secondary);">
+            <button onclick="event.stopPropagation(); toggleTheme()" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm transition hidden md:flex text-right" style="color:var(--color-ink-secondary);">
                 <i data-lucide="moon" class="w-5 h-5 flex-shrink-0 dark:hidden"></i>
                 <i data-lucide="sun" class="w-5 h-5 flex-shrink-0 hidden dark:block"></i>
                 <span class="nav-label dark:hidden">{{ __('dark_mode') }}</span>

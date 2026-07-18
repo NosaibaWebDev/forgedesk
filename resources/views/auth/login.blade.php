@@ -79,7 +79,7 @@
                         value="{{ old('email') }}"
                         required
                         autofocus
-                        class="input text-right"
+                        class="input" dir="ltr"
                         placeholder="example@email.com"
                     >
                 </div>
@@ -103,7 +103,7 @@
                             name="remember"
                             class="w-4 h-4 text-accent rounded focus:ring-accent/30"
                         >
-                        <span class="mr-2 text-sm" style="color:var(--color-ink-secondary);">{{ __('remember_me') }}</span>
+                        <span class="ms-2 text-sm" style="color:var(--color-ink-secondary);">{{ __('remember_me') }}</span>
                     </label>
                     <a href="{{ route('password.request') }}" class="text-sm font-medium transition" style="color:var(--color-accent);">
                         {{ __('forgot_password') }}
@@ -133,7 +133,7 @@
                 </button>
                 <a href="{{ route('language.switch', $currentLocale === 'he' ? 'ar' : 'he') }}" class="flex items-center gap-2 text-sm transition" style="color:var(--color-ink-muted);">
                     <i data-lucide="globe" class="w-4 h-4"></i>
-                    <span>{{ $currentLocale === 'he' ? 'عرب' : 'עב' }}</span>
+                    <span>{{ $currentLocale === 'ar' ? __('lang_short_ar') : __('lang_short_he') }}</span>
                 </a>
             </div>
         </div>

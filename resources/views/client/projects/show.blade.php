@@ -3,8 +3,8 @@
 @section('title', $project->title . ' - ' . __('projects'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('client.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
-    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
+    <a href="{{ route('client.dashboard') }}" class="text-ink-muted hover:text-accent transition hidden sm:inline">{{ __('home') }}</a>
+    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted hidden sm:block"></i>
     <a href="{{ route('client.projects.index') }}" class="text-ink-muted hover:text-accent transition">{{ __('my_projects') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
     <span class="text-ink font-medium">{{ $project->title }}</span>
@@ -15,21 +15,21 @@
 <div x-data="{ open: false }" class="relative">
     <button @click="open = !open" @click.outside="open = false" class="btn-ghost inline-flex items-center gap-2">
         <i data-lucide="download" class="w-4 h-4"></i>
-        {{ __('export') }}
-        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+        <span class="hidden sm:inline">{{ __('export') }}</span>
+        <i data-lucide="chevron-down" class="hidden sm:block w-3 h-3"></i>
     </button>
-    <div x-show="open" x-transition x-cloak class="absolute left-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
+    <div x-show="open" x-transition x-cloak class="absolute start-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
         <a href="{{ route('client.projects.export.project.csv', $project) }}" class="dropdown-item"><i data-lucide="file-text"></i>{{ __('export_csv') }}</a>
     </div>
 </div>
 @endsection
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-6">
     {{-- Project Info --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <h3 class="text-lg font-semibold text-ink mb-5">{{ __('project_details') }}</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div>
                 <label class="label">{{ __('status') }}</label>
                 @php
@@ -114,12 +114,12 @@
     </div>
 
     {{-- Tasks --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <h3 class="text-lg font-semibold text-ink mb-5">{{ __('tasks') }}</h3>
         @if($project->tasks->count())
             <div class="space-y-3">
                 @foreach($project->tasks as $task)
-                    <div class="p-4 bg-gray-50/50 rounded-btn hover:bg-gray-100/50 transition">
+                    <div class="p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-btn hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4 min-w-0">
                                 <div>
@@ -138,7 +138,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3 shrink-0">
+                            <div class="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
                                 @php
                                     $taskStatusColors = [
                                         'pending' => 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20',
@@ -150,8 +150,8 @@
                                 <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $taskStatusColors[$task->status->value] ?? '' }}">
                                     {{ $task->status_label }}
                                 </span>
-                                <span class="text-xs text-ink-muted">{{ $task->priority_label }}</span>
-                                <button onclick="document.getElementById('client-task-images-{{ $task->id }}').classList.toggle('hidden')" class="text-xs text-accent hover:text-accent-dark font-medium transition flex items-center gap-1">
+                                <span class="hidden sm:inline text-xs text-ink-muted">{{ $task->priority_label }}</span>
+                                <button onclick="document.getElementById('client-task-images-{{ $task->id }}').classList.toggle('hidden')" class="flex text-xs text-accent hover:text-accent-dark font-medium transition items-center gap-1">
                                     <i data-lucide="image" class="w-4 h-4"></i> {{ __('task_images') }}
                                 </button>
                             </div>
@@ -163,9 +163,9 @@
                                     @foreach($task->images as $image)
                                         <div class="relative group">
                                             <a href="{{ $image->url }}" target="_blank" class="block">
-                                                <img src="{{ $image->url }}" alt="{{ $image->original_name }}" width="80" height="80" class="w-20 h-20 rounded-btn object-cover border border-border">
+                                                <img src="{{ $image->url }}" alt="{{ $image->original_name }}" class="file-preview-thumb">
                                             </a>
-                                            <form method="POST" action="{{ route('client.projects.tasks.images.destroy', [$project, $task, $image]) }}" onsubmit="return confirm('{{ __("confirm") }}')" class="absolute top-0.5 right-0.5 opacity-0 group-hover:opacity-100 transition">
+                                            <form method="POST" action="{{ route('client.projects.tasks.images.destroy', [$project, $task, $image]) }}" onsubmit="return confirm('{{ __("confirm") }}')" class="absolute top-0.5 end-0.5 opacity-0 group-hover:opacity-100 transition">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="w-5 h-5 rounded-full bg-danger text-white flex items-center justify-center text-[10px] shadow-sm hover:bg-red-600 transition">×</button>
@@ -192,12 +192,12 @@
     </div>
 
     {{-- Files --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <h3 class="text-lg font-semibold text-ink mb-5">{{ __('files') }}</h3>
 
-        <form method="POST" action="{{ route('client.projects.files.store', $project) }}" enctype="multipart/form-data" class="mb-6 p-4 bg-gray-50/50 rounded-btn border border-border">
+        <form method="POST" action="{{ route('client.projects.files.store', $project) }}" enctype="multipart/form-data" class="mb-6 p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-btn border border-border">
             @csrf
-            <div class="flex items-end gap-3">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
                 <div class="flex-1 min-w-0">
                     <label for="file" class="label">{{ __('choose_files') }}</label>
                     <input type="file" id="file" name="files[]" multiple required
@@ -219,14 +219,14 @@
         @if($project->files->count())
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 @foreach($project->files as $file)
-                    <div class="flex items-center justify-between p-4 bg-gray-50/50 rounded-btn border border-border/50 hover:bg-gray-100/50 transition">
+                    <div class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-gray-800/50 rounded-btn border border-border/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex items-center gap-3 min-w-0">
                             @if($file->isImage())
                                 <a href="{{ $file->getTemporaryUrl() }}" target="_blank" class="flex-shrink-0">
-                                    <img src="{{ $file->getTemporaryUrl() }}" alt="{{ $file->original_name }}" width="40" height="40" class="w-10 h-10 rounded-btn object-cover border border-border">
+                                    <img src="{{ $file->getTemporaryUrl() }}" alt="{{ $file->original_name }}" class="file-preview-thumb">
                                 </a>
                             @else
-                                <div class="w-10 h-10 bg-accent/10 rounded-btn flex items-center justify-center flex-shrink-0">
+                                <div class="file-preview-placeholder">
                                     <i data-lucide="file" class="w-5 h-5 text-accent"></i>
                                 </div>
                             @endif
@@ -249,16 +249,17 @@
     </div>
 
     {{-- Messages --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <h3 class="text-lg font-semibold text-ink mb-5">{{ __('messages') }}</h3>
 
         <form method="POST" action="{{ route('client.messages.store', $project) }}" class="mb-6">
             @csrf
-            <div class="flex gap-3">
+            <div class="flex gap-2 sm:gap-3">
                 <input type="text" name="body" required placeholder="{{ __('type_message') }}"
-                    class="input flex-1">
-                <button type="submit" class="btn-primary">
-                    {{ __('send') }}
+                    class="input flex-1 min-w-0">
+                <button type="submit" class="btn-primary whitespace-nowrap">
+                    <i data-lucide="send" class="w-4 h-4 sm:hidden"></i>
+                    <span class="hidden sm:inline">{{ __('send') }}</span>
                 </button>
             </div>
             @error('body') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -267,7 +268,7 @@
         <div id="messages-container" class="space-y-4 max-h-96 overflow-y-auto">
             @forelse($project->messages as $message)
                 <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
-                    <div class="{{ $message->sender_id === auth()->id() ? 'max-w-md px-5 py-3.5 rounded-2xl bg-accent/10 text-ink border border-accent/20' : 'max-w-md px-5 py-3.5 rounded-2xl bg-white text-ink border border-border shadow-sm' }}">
+                    <div class="{{ $message->sender_id === auth()->id() ? 'max-w-[85%] sm:max-w-md px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-accent/10 text-ink border border-accent/20' : 'max-w-[85%] sm:max-w-md px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl bg-white dark:bg-gray-800 text-ink border border-border shadow-sm' }}">
                         <p class="text-xs text-ink-muted mb-1">{{ $message->sender->name }} · {{ $message->created_at->format('d/m/Y H:i') }}</p>
                         <p class="text-sm leading-relaxed">{{ $message->body }}</p>
                     </div>

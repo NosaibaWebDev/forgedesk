@@ -12,31 +12,31 @@
 @section('actions')
 <a href="{{ route('admin.projects.create') }}" class="btn-primary inline-flex items-center gap-2">
     <i data-lucide="plus" class="w-4 h-4"></i>
-    {{ __('new_project') }}
+    <span class="hidden sm:inline">{{ __('new_project') }}</span>
 </a>
 @endsection
 
 @section('content')
 {{-- Stats Row --}}
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-    <a href="{{ route('admin.projects.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
+    <a href="{{ route('admin.projects.index') }}" class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
         <p class="text-xs text-ink-muted">{{ __('projects') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">{{ $totalProjects }}</p>
         <p class="text-xs text-accent mt-1">{{ $activeProjects }} {{ __('active_projects') }}</p>
     </a>
-    <a href="{{ route('admin.clients.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
+    <a href="{{ route('admin.clients.index') }}" class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
         <p class="text-xs text-ink-muted">{{ __('clients') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">{{ $totalClients }}</p>
     </a>
-    <div class="bg-white rounded-card border border-border shadow-card p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
         <p class="text-xs text-ink-muted">{{ __('pending_tasks') }}</p>
         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $pendingTasks }}</p>
     </div>
-    <div class="bg-white rounded-card border border-border shadow-card p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
         <p class="text-xs text-ink-muted">{{ __('income') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">₪{{ number_format($totalRevenue, 0) }}</p>
     </div>
-    <a href="{{ route('admin.messages.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
+    <a href="{{ route('admin.messages.index') }}" class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
         <p class="text-xs text-ink-muted">{{ __('messages') }}</p>
         <p class="text-2xl font-bold {{ $unreadMessages > 0 ? 'text-danger' : 'text-ink' }} mt-1">{{ $unreadMessages }}</p>
         <p class="text-xs text-ink-muted mt-1">{{ __('unread_messages') }}</p>
@@ -52,7 +52,7 @@
     <div class="flex items-center justify-between mb-4">
         <h3 class="font-semibold text-ink text-lg">{{ __('project_status_kanban') }}</h3>
         <div class="flex items-center gap-2">
-            <button onclick="clearAllProjects()" class="text-ink-secondary hover:bg-gray-50 rounded-btn px-4 py-2 text-sm transition inline-flex items-center gap-1.5">
+            <button onclick="clearAllProjects()" class="text-ink-secondary hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-btn px-4 py-2 text-sm transition inline-flex items-center gap-1.5">
                 <i data-lucide="x" class="w-4 h-4"></i>
                 {{ __('clear_all') }}
             </button>
@@ -71,7 +71,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         @foreach($columns as $status => $col)
-            <div class="kanban-column bg-white rounded-card border border-border min-h-[300px] transition-colors"
+            <div class="kanban-column bg-white dark:bg-gray-800 rounded-card border border-border min-h-[300px] transition-colors"
                  data-status="{{ $status }}"
                  ondragover="event.preventDefault(); this.classList.add('ring-2', 'ring-accent/30')"
                  ondragleave="this.classList.remove('ring-2', 'ring-accent/30')"
@@ -87,20 +87,20 @@
                 </div>
                 <div class="p-3 space-y-2" id="column-{{ $status }}">
                     @foreach($activeProjectsList->where('status', $status) as $project)
-                        <div class="kanban-card bg-white rounded-card p-4 border border-border cursor-grab hover:shadow-md transition-all select-none"
+                        <div class="kanban-card bg-white dark:bg-gray-800 rounded-card p-4 border border-border cursor-grab hover:shadow-md transition-all select-none"
                              draggable="true"
                              oncontextmenu="return false;"
                              data-project-id="{{ $project->id }}"
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center justify-between mb-3">
                                 <a href="{{ route('admin.projects.show', $project) }}" class="font-medium text-sm text-ink hover:text-accent truncate flex-1">{{ $project->title }}</a>
-                                <button onclick="removeProject({{ $project->id }})" class="text-ink-muted hover:text-danger flex-shrink-0 ml-1 transition" title="{{ __('remove_from_board') }}">
+                                <button onclick="removeProject({{ $project->id }})" class="text-ink-muted hover:text-danger flex-shrink-0 ms-1 transition" title="{{ __('remove_from_board') }}">
                                     <i data-lucide="x" class="w-4 h-4"></i>
                                 </button>
                             </div>
                             <p class="text-xs text-ink-secondary mb-3">{{ $project->user->name }}</p>
                             <div class="flex items-center gap-2">
-                                <div class="flex-1 bg-gray-200 rounded-full h-1.5">
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-1.5">
                                     <div class="bg-accent h-1.5 rounded-full transition-all" style="width: {{ $project->progress }}%"></div>
                                 </div>
                                 <span class="text-xs text-ink-muted">{{ $project->progress }}%</span>
@@ -122,7 +122,7 @@
     {{-- Left Column: Urgent Tasks + Deadlines --}}
     <div class="lg:col-span-2 space-y-6">
         {{-- Urgent Tasks --}}
-        <div class="bg-white rounded-card border border-border shadow-card">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink flex items-center gap-2">
                     <span class="w-2 h-2 bg-danger rounded-full"></span>
@@ -131,7 +131,7 @@
             </div>
             <div class="divide-y divide-border">
                 @forelse($urgentTasks as $task)
-                    <a href="{{ route('admin.projects.show', $task->project) }}" class="block px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.projects.show', $task->project) }}" class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="font-medium text-ink text-sm">{{ $task->title }}</p>
@@ -157,7 +157,7 @@
         </div>
 
         {{-- Upcoming Deadlines --}}
-        <div class="bg-white rounded-card border border-border shadow-card">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink flex items-center gap-2">
                     <i data-lucide="clock" class="w-5 h-5 text-orange-500"></i>
@@ -166,13 +166,13 @@
             </div>
             <div class="divide-y divide-border">
                 @forelse($upcomingDeadlines as $task)
-                    <a href="{{ route('admin.projects.show', $task->project) }}" class="block px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.projects.show', $task->project) }}" class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="font-medium text-ink text-sm">{{ $task->title }}</p>
                                 <p class="text-xs text-ink-muted mt-0.5">{{ $task->project->title }}</p>
                             </div>
-                            <div class="text-left">
+                            <div class="text-start">
                                 @php
                                     $daysLeft = round(now()->diffInDays($task->due_date, false));
                                     $isOverdue = $daysLeft < 0;
@@ -196,14 +196,14 @@
     {{-- Right Column: Messages + Clients --}}
     <div class="space-y-6">
         {{-- Unread Messages --}}
-        <div class="bg-white rounded-card border border-border shadow-card">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink">{{ __('recent_messages') }}</h3>
                 <a href="{{ route('admin.messages.index') }}" class="text-sm text-accent hover:text-accent-dark transition">{{ __('all') }} ←</a>
             </div>
             <div class="divide-y divide-border">
                 @forelse($recentMessages as $message)
-                    <a href="{{ route('admin.messages.show', $message->project) }}" class="block px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.messages.show', $message->project) }}" class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                         <div class="flex items-start gap-3">
                             <x-user-avatar :user="$message->sender" size="sm" />
                             <div class="flex-1 min-w-0">
@@ -225,14 +225,14 @@
         </div>
 
         {{-- Recent Clients --}}
-        <div class="bg-white rounded-card border border-border shadow-card">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink">{{ __('recent_clients') }}</h3>
                 <a href="{{ route('admin.clients.index') }}" class="text-sm text-accent hover:text-accent-dark transition">{{ __('all') }} ←</a>
             </div>
             <div class="divide-y divide-border">
                 @forelse($recentClients as $client)
-                    <a href="{{ route('admin.clients.show', $client) }}" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.clients.show', $client) }}" class="flex items-center gap-3 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                         <x-user-avatar :user="$client" />
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-ink">{{ $client->name }}</p>

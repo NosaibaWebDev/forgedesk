@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ $currentLocale ?? 'he' }}" dir="{{ ($currentLocale ?? 'he') === 'ar' ? 'rtl' : 'rtl' }}" data-theme="light">
+<html lang="{{ $currentLocale ?? 'he' }}" dir="rtl" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,29 +78,29 @@
                 <div class="flex items-center gap-3">
                     @yield('actions')
                     @auth
-                    <div x-data="{ langOpen: false }" class="relative">
+                    <div x-data="{ langOpen: false }" class="relative hidden sm:block">
                         <button @click="langOpen = !langOpen" @keydown.escape="langOpen = false"
-                                class="flex items-center gap-1.5 px-3 py-2.5 rounded-btn text-sm font-medium transition border"
+                                class="flex items-center gap-1.5 px-2 sm:px-3 py-2.5 rounded-btn text-sm font-medium transition border"
                                 style="color:var(--color-ink-secondary); border-color:var(--color-border); background:var(--color-bg);">
                             <i data-lucide="globe" class="w-4 h-4"></i>
-                            <span>{{ $currentLocale === 'ar' ? 'عر' : 'עב' }}</span>
-                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                            <span class="hidden sm:inline">{{ $currentLocale === 'ar' ? __('lang_short_ar') : __('lang_short_he') }}</span>
+                            <i data-lucide="chevron-down" class="hidden sm:block w-3 h-3"></i>
                         </button>
                         <div x-show="langOpen" @click.away="langOpen = false" x-transition x-cloak
-                             class="absolute top-full mt-2 left-0 w-40 rounded-card py-1 z-50 shadow-elevated"
+                             class="absolute top-full mt-2 start-0 w-40 rounded-card py-1 z-50 shadow-elevated"
                              style="background:var(--color-card); border:1px solid var(--color-border);">
                             <a href="{{ route('language.switch', 'he') }}"
                                class="flex items-center gap-2 px-4 py-2.5 text-sm transition"
                                style="color:{{ $currentLocale === 'he' ? 'var(--color-accent)' : 'var(--color-ink)' }};">
                                 <i data-lucide="globe" class="w-4 h-4 flex-shrink-0" style="color:var(--color-ink-muted)"></i>
-                                <span class="font-medium">עברית</span>
+                                <span class="font-medium">{{ __('lang_hebrew') }}</span>
                                 @if($currentLocale === 'he')<i data-lucide="check" class="w-4 h-4 ms-auto" style="color:var(--color-accent)"></i>@endif
                             </a>
                             <a href="{{ route('language.switch', 'ar') }}"
                                class="flex items-center gap-2 px-4 py-2.5 text-sm transition"
                                style="color:{{ $currentLocale === 'ar' ? 'var(--color-accent)' : 'var(--color-ink)' }};">
                                 <i data-lucide="globe" class="w-4 h-4 flex-shrink-0" style="color:var(--color-ink-muted)"></i>
-                                <span class="font-medium">العربية</span>
+                                <span class="font-medium">{{ __('lang_arabic') }}</span>
                                 @if($currentLocale === 'ar')<i data-lucide="check" class="w-4 h-4 ms-auto" style="color:var(--color-accent)"></i>@endif
                             </a>
                         </div>
@@ -109,7 +109,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 @if(session('success'))
                     <div class="border px-5 py-3.5 rounded-card mb-6 flex items-center gap-3 text-sm font-medium" style="background:var(--color-accent-light); border-color:rgba(23,195,178,.2); color:var(--color-accent-dark);">
                         <i data-lucide="circle-check" class="w-5 h-5 flex-shrink-0"></i>

@@ -380,5 +380,16 @@
   "server_error_desc": "حدث خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.",
   "session_expired": "انتهت صلاحية الجلسة",
   "session_expired_desc": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
-  "back_to_home": "العودة إلى الصفحة الرئيسية"
+  "back_to_home": "العودة إلى الصفحة الرئيسية",
+  "lang_short_he": "עב",
+  "lang_short_ar": "عر",
+  "lang_hebrew": "עברית",
+  "lang_arabic": "العربية",
+  "from_date": "من تاريخ",
+  "to_date": "إلى تاريخ",
+  "close_menu": "إغلاق القائمة",
+  "auth.access_denied": "ليس لديك صلاحية للوصول إلى هذه المنطقة.",
+  "auth.account_disabled": "تم تعطيل حسابك. يرجى الاتصال بالمسؤول.",
+  "timer_already_stopped": "تم إيقاف المؤقت بالفعل.",
+  "auth.password_incorrect": "كلمة المرور غير صحيحة."
 }

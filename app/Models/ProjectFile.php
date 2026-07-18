@@ -18,6 +18,7 @@ class ProjectFile extends Model
         'task_id',
         'original_name',
         'stored_name',
+        'path',
         'mime_type',
         'size',
         'notes',
@@ -43,7 +44,8 @@ class ProjectFile extends Model
         return URL::temporarySignedRoute(
             'file.preview.project-file',
             now()->addHours(2),
-            ['file' => $this->id]
+            ['file' => $this->id],
+            false
         );
     }
 

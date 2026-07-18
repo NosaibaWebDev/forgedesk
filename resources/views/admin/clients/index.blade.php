@@ -10,15 +10,19 @@
 @endsection
 
 @section('actions')
-<a href="{{ route('admin.clients.create') }}" class="btn-primary">
-    + {{ __('new_client') }}
+<a href="{{ route('admin.clients.create') }}" class="btn-primary inline-flex items-center gap-2">
+    <i data-lucide="plus" class="w-4 h-4"></i>
+    <span class="hidden sm:inline">{{ __('new_client') }}</span>
 </a>
 @endsection
 
 @section('content')
-<div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-border">
+<div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card overflow-hidden">
+    <div class="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-border">
         <h2 class="text-lg font-semibold text-ink">{{ __('clients_list') }}</h2>
+        <a href="{{ route('admin.clients.create') }}" class="md:hidden btn-primary btn-sm inline-flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+        </a>
     </div>
 
     {{-- Desktop table --}}
@@ -26,36 +30,36 @@
         <table class="w-full text-right">
             <thead>
                 <tr class="border-b border-border">
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('name') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('email') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('phone') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('company') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('projects') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('name') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden lg:table-cell">{{ __('email') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('phone') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden md:table-cell">{{ __('company') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('projects') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('status') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border">
                 @forelse($clients as $client)
-                    <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.location.href='{{ route('admin.clients.show', $client) }}'">
-                        <td class="px-6 py-4">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition cursor-pointer" onclick="window.location.href='{{ route('admin.clients.show', $client) }}'">
+                        <td class="px-3 sm:px-6 py-4">
                             <div class="flex items-center gap-3">
                                 <x-user-avatar :user="$client" />
-                                <span class="font-medium text-ink">{{ $client->name }}</span>
+                                <span class="font-medium text-ink truncate">{{ $client->name }}</span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-ink-secondary">{{ $client->email }}</td>
-                        <td class="px-6 py-4 text-ink-secondary">{{ $client->phone ?? '-' }}</td>
-                        <td class="px-6 py-4 text-ink-secondary">{{ $client->company ?? '-' }}</td>
-                        <td class="px-6 py-4 text-ink-secondary">{{ $client->projects_count }}</td>
-                        <td class="px-6 py-4">
+                        <td class="px-3 sm:px-6 py-4 text-ink-secondary hidden lg:table-cell">{{ $client->email }}</td>
+                        <td class="px-3 sm:px-6 py-4 text-ink-secondary hidden sm:table-cell">{{ $client->phone ?? '-' }}</td>
+                        <td class="px-3 sm:px-6 py-4 text-ink-secondary hidden md:table-cell">{{ $client->company ?? '-' }}</td>
+                        <td class="px-3 sm:px-6 py-4 text-ink-secondary hidden sm:table-cell">{{ $client->projects_count }}</td>
+                        <td class="px-3 sm:px-6 py-4 hidden sm:table-cell">
                             @if($client->is_active)
                                 <span class="rounded-badge px-3 py-1 text-xs font-medium bg-green-100 text-green-800">{{ __('active') }}</span>
                             @else
                                 <span class="rounded-badge px-3 py-1 text-xs font-medium bg-red-100 text-red-800">{{ __('inactive') }}</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4" onclick="event.stopPropagation()">
+                        <td class="px-3 sm:px-6 py-4" onclick="event.stopPropagation()">
                             <a href="{{ route('admin.clients.edit', $client) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition">{{ __('edit') }}</a>
                         </td>
                     </tr>
@@ -76,7 +80,7 @@
     {{-- Mobile cards --}}
     <div class="md:hidden divide-y divide-border">
         @forelse($clients as $client)
-            <a href="{{ route('admin.clients.show', $client) }}" class="block p-4 hover:bg-gray-50 transition">
+            <a href="{{ route('admin.clients.show', $client) }}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                 <div class="flex items-start justify-between gap-3 mb-3">
                     <div class="flex items-center gap-3 min-w-0">
                         <x-user-avatar :user="$client" size="lg" />

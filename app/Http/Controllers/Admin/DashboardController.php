@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -84,7 +85,7 @@ class DashboardController extends Controller
 
     public function removeProject(Project $project)
     {
-        $this->authorize('update', $project);
+        $this->authorize('delete', $project);
         $project->update(['status' => 'cancelled']);
         return response()->json(['success' => true]);
     }
@@ -95,9 +96,14 @@ class DashboardController extends Controller
             'confirm' => 'required|in:cancel-all',
         ]);
 
-        Project::managedByAdmin(auth()->id())
+        $projects = Project::managedByAdmin(auth()->id())
             ->where('status', '!=', 'cancelled')
-            ->update(['status' => 'cancelled']);
+            ->get();
+
+        foreach ($projects as $project) {
+            $this->authorize('delete', $project);
+            $project->update(['status' => 'cancelled']);
+        }
 
         return response()->json(['success' => true]);
     }

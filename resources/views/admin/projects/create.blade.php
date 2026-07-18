@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <form method="POST" action="{{ route('admin.projects.store') }}">
             @csrf
 
@@ -45,31 +45,29 @@
                 @error('description') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="status" class="label">{{ __('status') }} *</label>
-                    <select id="status" name="status" required
-                        class="input">
-                        <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }}>{{ __('pending') }}</option>
-                        <option value="in_progress" {{ old('status') === 'in_progress' ? 'selected' : '' }}>{{ __('in_progress') }}</option>
-                        <option value="review" {{ old('status') === 'review' ? 'selected' : '' }}>{{ __('review') }}</option>
-                        <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>{{ __('completed') }}</option>
-                        <option value="cancelled" {{ old('status') === 'cancelled' ? 'selected' : '' }}>{{ __('cancelled') }}</option>
-                    </select>
-                    @error('status') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
+            <div class="mb-4">
+                <label for="status" class="label">{{ __('status') }} *</label>
+                <select id="status" name="status" required
+                    class="input">
+                    <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }}>{{ __('pending') }}</option>
+                    <option value="in_progress" {{ old('status') === 'in_progress' ? 'selected' : '' }}>{{ __('in_progress') }}</option>
+                    <option value="review" {{ old('status') === 'review' ? 'selected' : '' }}>{{ __('review') }}</option>
+                    <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>{{ __('completed') }}</option>
+                    <option value="cancelled" {{ old('status') === 'cancelled' ? 'selected' : '' }}>{{ __('cancelled') }}</option>
+                </select>
+                @error('status') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
+            </div>
 
-                <div>
-                    <label for="priority" class="label">{{ __('priority') }} *</label>
-                    <select id="priority" name="priority" required
-                        class="input">
-                        <option value="low" {{ old('priority') === 'low' ? 'selected' : '' }}>{{ __('priority_low') }}</option>
-                        <option value="medium" {{ old('priority', 'medium') === 'medium' ? 'selected' : '' }}>{{ __('priority_medium') }}</option>
-                        <option value="high" {{ old('priority') === 'high' ? 'selected' : '' }}>{{ __('priority_high') }}</option>
-                        <option value="urgent" {{ old('priority') === 'urgent' ? 'selected' : '' }}>{{ __('priority_urgent') }}</option>
-                    </select>
-                    @error('priority') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
+            <div class="mb-4">
+                <label for="priority" class="label">{{ __('priority') }} *</label>
+                <select id="priority" name="priority" required
+                    class="input">
+                    <option value="low" {{ old('priority') === 'low' ? 'selected' : '' }}>{{ __('priority_low') }}</option>
+                    <option value="medium" {{ old('priority', 'medium') === 'medium' ? 'selected' : '' }}>{{ __('priority_medium') }}</option>
+                    <option value="high" {{ old('priority') === 'high' ? 'selected' : '' }}>{{ __('priority_high') }}</option>
+                    <option value="urgent" {{ old('priority') === 'urgent' ? 'selected' : '' }}>{{ __('priority_urgent') }}</option>
+                </select>
+                @error('priority') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
             <div class="mb-4">
@@ -79,41 +77,37 @@
                 @error('budget') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label for="hourly_rate" class="label">{{ __('hourly_rate') }} (₪)</label>
-                    <input type="number" id="hourly_rate" name="hourly_rate" value="{{ old('hourly_rate') }}" min="0" step="0.01"
-                        class="input" placeholder="0">
-                    @error('hourly_rate') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="estimated_hours" class="label">{{ __('estimated_hours') }}</label>
-                    <input type="number" id="estimated_hours" name="estimated_hours" value="{{ old('estimated_hours') }}" min="0" step="0.5"
-                        class="input" placeholder="0">
-                    @error('estimated_hours') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label class="label">{{ __('estimated_total') }} (₪)</label>
-                    <div class="input bg-gray-50 flex items-center font-semibold" id="total-price-display">-</div>
-                </div>
+            <div class="mb-4">
+                <label for="hourly_rate" class="label">{{ __('hourly_rate') }} (₪)</label>
+                <input type="number" id="hourly_rate" name="hourly_rate" value="{{ old('hourly_rate') }}" min="0" step="0.01"
+                    class="input" placeholder="0">
+                @error('hourly_rate') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="start_date" class="label">{{ __('start_date') }}</label>
-                    <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}"
-                        class="input">
-                    @error('start_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
+            <div class="mb-4">
+                <label for="estimated_hours" class="label">{{ __('estimated_hours') }}</label>
+                <input type="number" id="estimated_hours" name="estimated_hours" value="{{ old('estimated_hours') }}" min="0" step="0.5"
+                    class="input" placeholder="0">
+                @error('estimated_hours') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
+            </div>
 
-                <div>
-                    <label for="due_date" class="label">{{ __('due_date') }}</label>
-                    <input type="date" id="due_date" name="due_date" value="{{ old('due_date') }}"
-                        class="input">
-                    @error('due_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
+            <div class="mb-4">
+                <label class="label">{{ __('estimated_total') }} (₪)</label>
+                <div class="input bg-gray-50 dark:bg-gray-700 flex items-center font-semibold" id="total-price-display">-</div>
+            </div>
+
+            <div class="mb-4">
+                <label for="start_date" class="label">{{ __('start_date') }}</label>
+                <input type="date" id="start_date" name="start_date" value="{{ old('start_date') }}"
+                    class="input" style="max-width:305px">
+                @error('start_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="due_date" class="label">{{ __('due_date') }}</label>
+                <input type="date" id="due_date" name="due_date" value="{{ old('due_date') }}"
+                    class="input" style="max-width:305px">
+                @error('due_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
             <div class="mb-6">

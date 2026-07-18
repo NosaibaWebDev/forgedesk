@@ -104,7 +104,7 @@ input[type="date"].input, input[type="time"].input { padding-left:2.5rem; color-
 #sidebar.collapsed .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; gap: 0 !important; }
 #sidebar.collapsed .nav-item .nav-badge { display: none; }
 #sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; overflow: hidden; }
-#sidebar.collapsed .sidebar-user-info-parent { justify-content: center; }
+#sidebar.collapsed .sidebar-user-info-parent { justify-content: center; align-items: center; gap: 0 !important; padding: 0.5rem !important; margin: 0 !important; }
 #sidebar.collapsed .sidebar-logout-text { display: none; }
 #sidebar-overlay { display: none; }
 .nav-item-active { background: var(--color-accent-light) !important; color: var(--color-accent) !important; font-weight: 500; }
@@ -132,7 +132,7 @@ input[type="date"].input, input[type="time"].input { padding-left:2.5rem; color-
     html.sidebar-was-collapsed #sidebar .sidebar-user-info { opacity: 0; width: 0; overflow: hidden; }
     html.sidebar-was-collapsed #sidebar .sidebar-logout-text { display: none; }
     html.sidebar-was-collapsed #sidebar .nav-badge { display: none; }
-    html.sidebar-was-collapsed #sidebar .sidebar-user-info-parent { justify-content: center; }
+    html.sidebar-was-collapsed #sidebar .sidebar-user-info-parent { justify-content: center; align-items: center; gap: 0 !important; padding: 0.5rem !important; margin: 0 !important; }
     html.sidebar-was-collapsed #sidebar .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; gap: 0 !important; }
 }
 
@@ -225,3 +225,12 @@ input[type="date"].input, input[type="time"].input { padding-left:2.5rem; color-
 .dropdown-item:hover { background:var(--color-nav-hover); color:var(--color-ink) !important; }
 .dropdown-item i { color:var(--color-ink-muted); flex-shrink:0; font-size:0; }
 .dropdown-item i svg { width:1rem; height:1rem; }
+
+.file-preview-thumb { width:68px; height:68px; border-radius:12px; object-fit:cover; border:1px solid var(--color-border); }
+.file-preview-placeholder { width:68px; height:68px; border-radius:12px; background:var(--color-elevated); border:1px solid var(--color-border); display:flex; align-items:center; justify-content:center; }
+
+@media (max-width: 640px) {
+    :root { --sidebar-w: 280px; }
+    .file-preview-thumb, .file-preview-placeholder { width:48px; height:48px; }
+    .btn-primary, .btn-secondary, .btn-danger { padding: 0.5rem 0.875rem; }
+}

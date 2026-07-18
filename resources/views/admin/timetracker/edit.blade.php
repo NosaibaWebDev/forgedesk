@@ -14,7 +14,7 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <h3 class="text-lg font-semibold text-ink mb-6">{{ __('edit_entry') }}</h3>
         <form method="POST" action="{{ route('admin.timetracker.update', $entry) }}">
             @csrf
@@ -39,18 +39,18 @@
                     <label class="label">{{ __('description') }}</label>
                     <input type="text" name="description" value="{{ $entry->description }}" placeholder="{{ __('description_placeholder') }}" class="input">
                 </div>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="label">{{ __('date') }}</label>
-                        <input type="date" name="date" value="{{ $entry->date->format('Y-m-d') }}" required class="input">
+                        <input type="date" name="date" value="{{ $entry->date->format('Y-m-d') }}" required class="input" style="max-width:305px">
                     </div>
                     <div>
                         <label class="label">{{ __('start_time') }}</label>
-                        <input type="time" name="start_time" value="{{ $entry->start_time->format('H:i') }}" required class="input">
+                        <input type="time" name="start_time" value="{{ $entry->start_time->format('H:i') }}" required class="input" style="max-width:305px">
                     </div>
                     <div>
                         <label class="label">{{ __('end_time') }}</label>
-                        <input type="time" name="end_time" value="{{ $entry->end_time ? $entry->end_time->format('H:i') : '' }}" required class="input">
+                        <input type="time" name="end_time" value="{{ $entry->end_time ? $entry->end_time->format('H:i') : '' }}" required class="input" style="max-width:305px">
                     </div>
                 </div>
                 <div class="flex gap-3 pt-2">

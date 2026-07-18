@@ -3,8 +3,8 @@
 @section('title', __('time_tracker_title'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
-    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition hidden sm:inline">{{ __('home') }}</a>
+    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted hidden sm:block"></i>
     <span class="text-ink font-medium">{{ __('time_tracking') }}</span>
 </nav>
 @endsection
@@ -13,10 +13,10 @@
 <div x-data="{ open: false }" class="relative">
     <button @click="open = !open" @click.outside="open = false" class="btn-ghost inline-flex items-center gap-1">
         <i data-lucide="download" class="w-4 h-4"></i>
-        {{ __('export') }}
-        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+        <span class="hidden sm:inline">{{ __('export') }}</span>
+        <i data-lucide="chevron-down" class="hidden sm:block w-3 h-3"></i>
     </button>
-    <div x-show="open" x-transition x-cloak class="absolute left-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
+    <div x-show="open" x-transition x-cloak class="absolute start-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
         <a href="{{ route('admin.timetracker.export.csv', request()->query()) }}" class="dropdown-item"><i data-lucide="file-text"></i>{{ __('export_csv') }}</a>
         <a href="{{ route('admin.timetracker.export.pdf', request()->query()) }}" class="dropdown-item" target="_blank"><i data-lucide="file"></i>{{ __('export_pdf') }}</a>
     </div>
@@ -27,19 +27,19 @@
 <div class="space-y-6">
     {{-- Stats --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-card border border-border shadow-card p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
             <p class="text-xs text-ink-muted">{{ __('today') }}</p>
             <p class="text-2xl font-bold text-ink mt-1">{{ sprintf('%02d:%02d', floor($totalToday / 60), $totalToday % 60) }}</p>
         </div>
-        <div class="bg-white rounded-card border border-border shadow-card p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
             <p class="text-xs text-ink-muted">{{ __('this_week') }}</p>
             <p class="text-2xl font-bold text-ink mt-1">{{ sprintf('%02d:%02d', floor($totalWeek / 60), $totalWeek % 60) }}</p>
         </div>
-        <div class="bg-white rounded-card border border-border shadow-card p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
             <p class="text-xs text-ink-muted">{{ __('this_month') }}</p>
             <p class="text-2xl font-bold text-ink mt-1">{{ sprintf('%02d:%02d', floor($totalMonth / 60), $totalMonth % 60) }}</p>
         </div>
-        <div class="{{ $runningEntry ? 'bg-accent/10 border-accent/20' : 'bg-white' }} rounded-card border shadow-card p-4">
+        <div class="{{ $runningEntry ? 'bg-accent/10 border-accent/20' : 'bg-white dark:bg-gray-800' }} rounded-card border shadow-card p-4">
             <p class="text-xs text-ink-muted">{{ __('timer_status') }}</p>
             @if($runningEntry)
                 <p class="text-lg font-bold text-accent mt-1" id="running-timer" data-start="{{ $runningEntry->start_time->toIso8601String() }}">● {{ __('running') }}</p>
@@ -51,9 +51,9 @@
     </div>
 
     {{-- Filters --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-4">
-        <form method="GET" action="{{ route('admin.timetracker.index') }}" class="flex flex-wrap items-end gap-3">
-            <div class="flex-1 min-w-[160px]">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4">
+        <form method="GET" action="{{ route('admin.timetracker.index') }}" class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-end gap-3">
+            <div class="flex-1 sm:min-w-[160px]">
                 <label class="label">{{ __('project_name') }}</label>
                 <select name="project_id" class="input">
                     <option value="">{{ __('all') }}</option>
@@ -62,7 +62,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="flex-1 min-w-[160px]">
+            <div class="flex-1 sm:min-w-[160px]">
                 <label class="label">{{ __('client') }}</label>
                 <select name="client_id" class="input">
                     <option value="">{{ __('all') }}</option>
@@ -71,18 +71,20 @@
                     @endforeach
                 </select>
             </div>
-            <div class="min-w-[140px]">
-                <label class="label">{{ __('start_date') }}</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}" class="input">
+            <div class="sm:min-w-[140px]">
+                <label class="label">{{ __('from_date') }}</label>
+                <input type="date" name="date_from" value="{{ request('date_from') }}" class="input" style="max-width:305px">
             </div>
-            <div class="min-w-[140px]">
-                <label class="label">{{ __('due_date') }}</label>
-                <input type="date" name="date_to" value="{{ request('date_to') }}" class="input">
+            <div class="sm:min-w-[140px]">
+                <label class="label">{{ __('to_date') }}</label>
+                <input type="date" name="date_to" value="{{ request('date_to') }}" class="input" style="max-width:305px">
             </div>
-            <button type="submit" class="btn-primary">{{ __('filter') }}</button>
-            @if(request()->hasAny(['project_id', 'client_id', 'date_from', 'date_to']))
-                <a href="{{ route('admin.timetracker.index') }}" class="btn-ghost btn-sm">{{ __('clear') }}</a>
-            @endif
+            <div class="flex gap-3">
+                <button type="submit" class="btn-primary flex-1 sm:flex-none">{{ __('filter') }}</button>
+                @if(request()->hasAny(['project_id', 'client_id', 'date_from', 'date_to']))
+                    <a href="{{ route('admin.timetracker.index') }}" class="btn-ghost btn-sm">{{ __('clear') }}</a>
+                @endif
+            </div>
         </form>
         @if(request()->hasAny(['project_id', 'client_id', 'date_from', 'date_to']))
             <div class="mt-2 pt-2 border-t border-border flex items-center gap-2">
@@ -96,7 +98,7 @@
         {{-- Left: Timer + Manual Entry --}}
         <div class="space-y-6">
             {{-- Active Timer --}}
-            <div class="bg-white rounded-card border border-border shadow-card p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6">
                 <h3 class="text-lg font-semibold text-ink mb-4">{{ __('timer') }}</h3>
 
                 @if($runningEntry)
@@ -142,7 +144,7 @@
             </div>
 
             {{-- Manual Entry --}}
-            <div class="bg-white rounded-card border border-border shadow-card p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6">
                 <h3 class="text-lg font-semibold text-ink mb-4">{{ __('add_manually') }}</h3>
                 <form method="POST" action="{{ route('admin.timetracker.store') }}">
                     @csrf
@@ -160,18 +162,18 @@
                             <label class="label">{{ __('description') }}</label>
                             <input type="text" name="description" placeholder="{{ __('description_placeholder') }}" class="input">
                         </div>
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label class="label">{{ __('date') }}</label>
-                                <input type="date" name="date" value="{{ now()->format('Y-m-d') }}" required class="input">
+                                <input type="date" name="date" value="{{ now()->format('Y-m-d') }}" required class="input" style="max-width:305px">
                             </div>
                             <div>
                                 <label class="label">{{ __('start_time') }}</label>
-                                <input type="time" name="start_time" required class="input">
+                                <input type="time" name="start_time" required class="input" style="max-width:305px">
                             </div>
                             <div>
                                 <label class="label">{{ __('end_time') }}</label>
-                                <input type="time" name="end_time" required class="input">
+                                <input type="time" name="end_time" required class="input" style="max-width:305px">
                             </div>
                         </div>
                         <button type="submit" class="btn-primary w-full justify-center">
@@ -184,7 +186,7 @@
 
         {{-- Right: Entries List --}}
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-card border border-border shadow-card">
+            <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card">
                 <div class="p-4 border-b border-border">
                     <h3 class="font-semibold text-ink">{{ __('time_entries') }}</h3>
                 </div>
@@ -201,9 +203,10 @@
                                 @foreach($dayEntries as $entry)
                                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-surface rounded-card {{ $entry->is_running ? 'ring-2 ring-accent' : '' }}">
                                         <div class="flex items-start gap-3 min-w-0">
-                                            <span class="text-xs text-ink-muted font-mono shrink-0 w-20 sm:w-24">
-                                                {{ $entry->start_time->format('H:i') }}{{ $entry->end_time ? ' - ' . $entry->end_time->format('H:i') : ' - ' . __('running') }}
-                                            </span>
+                                            <div class="shrink-0 text-xs text-ink-muted">
+                                                <span class="text-ink-secondary font-medium block">{{ $entry->start_time->format('d/m/Y') }}</span>
+                                                <span class="font-mono">{{ $entry->start_time->format('H:i') }}{{ $entry->end_time ? ' - ' . $entry->end_time->format('H:i') : ' - ' . __('running') }}</span>
+                                            </div>
                                             <div class="min-w-0">
                                                 <p class="text-sm font-medium text-ink truncate">{{ $entry->description ?? $entry->project?->title ?? __('no_description') }}</p>
                                                 @if($entry->project)

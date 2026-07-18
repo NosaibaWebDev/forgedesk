@@ -12,9 +12,9 @@
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6">
     {{-- Avatar --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6">
         <h2 class="text-lg font-semibold text-ink mb-5">{{ __('profile_picture') }}</h2>
-        <div class="flex items-center gap-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
             <div class="flex flex-col items-center gap-2">
                 <div x-data="{ preview: '{{ $user->avatar && Storage::disk('public')->exists($user->avatar) ? Storage::disk('public')->url($user->avatar) : '' }}' }">
                     <template x-if="preview">
@@ -58,7 +58,7 @@
     </div>
 
     {{-- Personal Info --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6">
         <h2 class="text-lg font-semibold text-ink mb-5">{{ __('personal_details') }}</h2>
         <form method="POST" action="{{ route('profile.update') }}">
             @csrf
@@ -97,7 +97,7 @@
     </div>
 
     {{-- Password --}}
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-6">
         <h2 class="text-lg font-semibold text-ink mb-5">{{ __('change_password') }}</h2>
         <form method="POST" action="{{ route('profile.password.update') }}">
             @csrf

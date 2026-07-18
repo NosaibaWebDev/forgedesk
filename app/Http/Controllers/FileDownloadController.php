@@ -53,7 +53,7 @@ class FileDownloadController extends Controller
             }
         }, 200, [
             'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . $file->original_name . '"',
+            'Content-Disposition' => 'inline; filename*=UTF-8\'\'' . rawurlencode($file->original_name),
         ]);
     }
 
@@ -83,16 +83,20 @@ class FileDownloadController extends Controller
             }
         }, 200, [
             'Content-Type' => $mime,
-            'Content-Disposition' => 'inline; filename="' . $image->original_name . '"',
+            'Content-Disposition' => 'inline; filename*=UTF-8\'\'' . rawurlencode($image->original_name),
         ]);
     }
 
     public static function signedUrl(string $type, int $id): string
     {
+        $routeName = $type === 'task-image' ? 'file.download.task-image' : 'file.download.project-file';
+        $paramName = $type === 'task-image' ? 'image' : 'file';
+
         return URL::temporarySignedRoute(
-            "file.download.{$type}",
+            $routeName,
             now()->addHours(2),
-            $type === 'project-file' ? 'file' : 'image'
+            [$paramName => $id],
+            false
         );
     }
 }

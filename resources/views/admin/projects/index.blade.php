@@ -2,10 +2,10 @@
 
 @section('title', __('projects_list'))
 @section('breadcrumbs')
-<nav class="flex items-center gap-2 text-sm">
+<nav class="flex items-center gap-2 text-sm min-w-0">
     <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">{{ __('projects') }}</span>
+    <span class="text-ink font-medium truncate">{{ __('projects') }}</span>
 </nav>
 @endsection
 
@@ -14,23 +14,24 @@
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" @click.outside="open = false" class="btn-ghost inline-flex items-center gap-2">
             <i data-lucide="download" class="w-4 h-4"></i>
-            {{ __('export') }}
-            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+            <span class="hidden sm:inline">{{ __('export') }}</span>
+            <i data-lucide="chevron-down" class="hidden sm:block w-3 h-3"></i>
         </button>
-        <div x-show="open" x-transition x-cloak class="absolute left-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
+        <div x-show="open" x-transition x-cloak class="absolute start-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
             <a href="{{ route('admin.projects.export.csv') }}" class="dropdown-item"><i data-lucide="file-text"></i>{{ __('export_csv') }}</a>
             <a href="{{ route('admin.projects.export.pdf') }}" class="dropdown-item" target="_blank"><i data-lucide="file"></i>{{ __('export_pdf') }}</a>
         </div>
     </div>
-    <a href="{{ route('admin.projects.create') }}" class="btn-primary">
-        + {{ __('new_project') }}
+    <a href="{{ route('admin.projects.create') }}" class="btn-primary inline-flex items-center gap-2">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">{{ __('new_project') }}</span>
     </a>
 </div>
 @endsection
 
 @section('content')
-<div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-border">
+<div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card overflow-hidden">
+    <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-border">
         <h2 class="text-lg font-semibold text-ink">{{ __('projects_list') }}</h2>
     </div>
 
@@ -39,23 +40,23 @@
         <table class="w-full text-right">
             <thead>
                 <tr class="border-b border-border">
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('project_name') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('client') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('priority') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('progress') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('due_date') }}</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('project_name') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden md:table-cell">{{ __('client') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('status') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('priority') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('progress') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider hidden sm:table-cell">{{ __('due_date') }}</th>
+                    <th class="px-3 sm:px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border">
                 @forelse($projects as $project)
-                    <tr class="hover:bg-gray-50 transition cursor-pointer" onclick="window.location.href='{{ route('admin.projects.show', $project) }}'">
-                        <td class="px-6 py-5">
-                            <span class="text-accent font-medium">{{ $project->title }}</span>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition cursor-pointer" onclick="window.location.href='{{ route('admin.projects.show', $project) }}'">
+                        <td class="px-3 sm:px-6 py-5">
+                            <span class="text-accent font-medium truncate block">{{ $project->title }}</span>
                         </td>
-                        <td class="px-6 py-5 text-ink-secondary">{{ $project->user->name }}</td>
-                        <td class="px-6 py-5">
+                        <td class="px-3 sm:px-6 py-5 text-ink-secondary hidden md:table-cell">{{ $project->user->name }}</td>
+                        <td class="px-3 sm:px-6 py-5 hidden sm:table-cell">
                             @php
                                 $statusColors = [
                                     'pending' => 'bg-amber-50 text-amber-700 ring-amber-600/20',
@@ -65,11 +66,11 @@
                                     'cancelled' => 'bg-red-50 text-red-700 ring-red-600/20',
                                 ];
                             @endphp
-                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status->value] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
+                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status->value] ?? 'bg-gray-50 dark:bg-gray-700 text-gray-700 ring-gray-600/20' }}">
                                 {{ $project->status_label }}
                             </span>
                         </td>
-                        <td class="px-6 py-5">
+                        <td class="px-3 sm:px-6 py-5 hidden sm:table-cell">
                             @php
                                 $priorityColors = [
                                     'low' => 'text-ink-muted',
@@ -82,21 +83,19 @@
                                 {{ $project->priority_label }}
                             </span>
                         </td>
-                        <td class="px-6 py-5">
+                        <td class="px-3 sm:px-6 py-5 hidden sm:table-cell">
                             <div class="flex items-center gap-3">
-                                <div class="flex-1 bg-accent/10 rounded-full h-2 w-24">
+                                <div class="flex-1 bg-accent/10 rounded-full h-2 w-20 sm:w-24">
                                     <div class="bg-accent h-2 rounded-full transition-all" style="width: {{ $project->progress }}%"></div>
                                 </div>
                                 <span class="text-xs text-ink-muted font-medium">{{ $project->progress }}%</span>
                             </div>
                         </td>
-                        <td class="px-6 py-5 text-sm text-ink-secondary">
+                        <td class="px-3 sm:px-6 py-5 text-sm text-ink-secondary hidden sm:table-cell">
                             {{ $project->due_date ? $project->due_date->format('d/m/Y') : '-' }}
                         </td>
-                        <td class="px-6 py-5">
-                            <div class="flex items-center gap-3">
-                                <a href="{{ route('admin.projects.edit', $project) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition" onclick="event.stopPropagation()">{{ __('edit') }}</a>
-                            </div>
+                        <td class="px-3 sm:px-6 py-5">
+                            <a href="{{ route('admin.projects.edit', $project) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition" onclick="event.stopPropagation()">{{ __('edit') }}</a>
                         </td>
                     </tr>
                 @empty
@@ -116,7 +115,7 @@
     {{-- Mobile cards --}}
     <div class="md:hidden divide-y divide-border">
         @forelse($projects as $project)
-            <a href="{{ route('admin.projects.show', $project) }}" class="block p-4 hover:bg-gray-50 transition">
+            <a href="{{ route('admin.projects.show', $project) }}" class="block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                 <div class="flex items-start justify-between gap-3 mb-3">
                     <div class="min-w-0">
                         <p class="font-medium text-accent truncate">{{ $project->title }}</p>
@@ -131,7 +130,7 @@
                             'cancelled' => 'bg-red-50 text-red-700 ring-red-600/20',
                         ];
                     @endphp
-                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status->value] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
+                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status->value] ?? 'bg-gray-50 dark:bg-gray-700 text-gray-700 ring-gray-600/20' }}">
                         {{ $project->status_label }}
                     </span>
                 </div>
@@ -172,7 +171,7 @@
     </div>
 
     @if($projects->hasPages())
-    <div class="px-6 py-4 border-t border-border">
+    <div class="px-4 sm:px-6 py-4 border-t border-border">
         {{ $projects->links() }}
     </div>
     @endif

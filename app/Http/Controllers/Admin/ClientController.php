@@ -50,7 +50,7 @@ class ClientController extends Controller
 
     public function show(User $client)
     {
-        abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
+        $this->authorize('view', $client);
 
         $client->load(['projects' => function ($q) {
             $q->latest();
@@ -61,13 +61,13 @@ class ClientController extends Controller
 
     public function edit(User $client)
     {
-        abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
+        $this->authorize('update', $client);
         return view('admin.clients.edit', compact('client'));
     }
 
     public function update(UpdateClientRequest $request, User $client)
     {
-        abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
+        $this->authorize('update', $client);
 
         $validated = $request->validated();
         $isActive = $validated['is_active'] ?? $client->is_active;
@@ -81,7 +81,7 @@ class ClientController extends Controller
 
     public function destroy(User $client)
     {
-        abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
+        $this->authorize('delete', $client);
 
         if ($client->projects()->count() > 0) {
             return back()->with('error', __('client_has_projects'));

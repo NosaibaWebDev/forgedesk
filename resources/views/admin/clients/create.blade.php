@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-card border border-border shadow-card p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card p-4 sm:p-6">
         <form method="POST" action="{{ route('admin.clients.store') }}">
             @csrf
 

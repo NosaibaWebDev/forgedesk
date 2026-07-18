@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\TimeEntry;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class TimeTrackerController extends Controller
@@ -225,26 +226,34 @@ class TimeTrackerController extends Controller
     {
         $userId = auth()->id();
 
-        $running = TimeEntry::forUser($userId)->running()->first();
-        if ($running) {
+        $result = DB::transaction(function () use ($userId, $request) {
+            $running = TimeEntry::forUser($userId)->running()->lockForUpdate()->first();
+            if ($running) {
+                return ['error' => true];
+            }
+
+            $validated = $request->validate([
+                'project_id' => ['nullable', 'exists:projects,id', $this->managedProjectRule()],
+                'task_id' => ['nullable', 'exists:tasks,id', $this->taskBelongsToProjectRule($request->project_id)],
+                'description' => 'nullable|string|max:255',
+            ]);
+
+            TimeEntry::create([
+                'user_id' => $userId,
+                'project_id' => $validated['project_id'] ?? null,
+                'task_id' => $validated['task_id'] ?? null,
+                'description' => $validated['description'] ?? null,
+                'start_time' => now(),
+                'is_running' => true,
+                'date' => Carbon::today(),
+            ]);
+
+            return ['error' => false];
+        });
+
+        if ($result['error']) {
             return redirect()->route('admin.timetracker.index')->with('error', __('already_running'));
         }
-
-        $validated = $request->validate([
-            'project_id' => ['nullable', 'exists:projects,id', $this->managedProjectRule()],
-            'task_id' => ['nullable', 'exists:tasks,id', $this->taskBelongsToProjectRule($request->project_id)],
-            'description' => 'nullable|string|max:255',
-        ]);
-
-        TimeEntry::create([
-            'user_id' => $userId,
-            'project_id' => $validated['project_id'] ?? null,
-            'task_id' => $validated['task_id'] ?? null,
-            'description' => $validated['description'] ?? null,
-            'start_time' => now(),
-            'is_running' => true,
-            'date' => Carbon::today(),
-        ]);
 
         return redirect()->route('admin.timetracker.index')->with('success', __('timer_started'));
     }
@@ -252,15 +261,25 @@ class TimeTrackerController extends Controller
     public function stop(TimeEntry $entry)
     {
         abort_unless($entry->user_id === auth()->id(), 403);
-        abort_unless($entry->is_running, 400);
 
-        $entry->update([
-            'end_time' => now(),
-            'duration_minutes' => $entry->start_time->diffInMinutes(now()),
-            'is_running' => false,
-        ]);
+        $result = DB::transaction(function () use ($entry) {
+            $locked = TimeEntry::where('id', $entry->id)->lockForUpdate()->first();
+            if (!$locked->is_running) {
+                return ['error' => true];
+            }
+            $locked->update([
+                'end_time' => now(),
+                'duration_minutes' => $locked->start_time->diffInMinutes(now()),
+                'is_running' => false,
+            ]);
+            return ['error' => false, 'entry' => $locked];
+        });
 
-        return redirect()->route('admin.timetracker.index')->with('success', __('timer_stopped') . ' ' . $entry->fresh()->formatted_duration);
+        if ($result['error']) {
+            return redirect()->route('admin.timetracker.index')->with('error', __('timer_already_stopped'));
+        }
+
+        return redirect()->route('admin.timetracker.index')->with('success', __('timer_stopped') . ' ' . $result['entry']->fresh()->formatted_duration);
     }
 
     public function destroy(TimeEntry $entry)

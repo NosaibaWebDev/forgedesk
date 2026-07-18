@@ -101,7 +101,7 @@
                 </button>
                 <a href="{{ route('language.switch', $currentLocale === 'he' ? 'ar' : 'he') }}" class="flex items-center gap-2 text-sm transition" style="color:var(--color-ink-muted);">
                     <i data-lucide="globe" class="w-4 h-4"></i>
-                    <span>{{ $currentLocale === 'he' ? 'عرب' : 'עב' }}</span>
+                    <span>{{ $currentLocale === 'ar' ? __('lang_short_ar') : __('lang_short_he') }}</span>
                 </a>
             </div>
         </div>

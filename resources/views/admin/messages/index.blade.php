@@ -2,28 +2,28 @@
 
 @section('title', __('messages'))
 @section('breadcrumbs')
-<nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
-    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">{{ __('messages') }}</span>
+<nav class="flex items-center gap-2 text-sm min-w-0">
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition hidden sm:inline">{{ __('home') }}</a>
+    <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted hidden sm:block"></i>
+    <span class="text-ink font-medium truncate">{{ __('messages') }}</span>
 </nav>
 @endsection
 
 @section('content')
-<div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
-    <div class="px-6 py-5 border-b border-border">
+<div class="bg-white dark:bg-gray-800 rounded-card border border-border shadow-card overflow-hidden">
+    <div class="px-4 sm:px-6 py-4 sm:py-5 border-b border-border">
         <h2 class="text-lg font-semibold text-ink">{{ __('messages_list') }}</h2>
     </div>
     <div class="divide-y divide-border">
         @forelse($conversations as $project)
-            <a href="{{ route('admin.messages.show', $project) }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 hover:bg-gray-50 transition cursor-pointer">
+            <a href="{{ route('admin.messages.show', $project) }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition cursor-pointer">
                 <div class="flex items-center gap-4 min-w-0">
                     <x-user-avatar :user="$project->user" size="lg" />
                     <div class="min-w-0">
                         <p class="font-medium text-ink">{{ $project->user->name }}</p>
                         <p class="text-sm text-ink-secondary truncate">{{ $project->title }}</p>
                         @if($project->messages->first())
-                            <p class="text-sm text-ink-muted mt-1 truncate max-w-xs sm:max-w-md">{{ $project->messages->first()->body }}</p>
+                            <p class="text-sm text-ink-muted mt-1 truncate max-w-xs sm:max-w-md">{{ \Illuminate\Support\Str::limit($project->messages->first()->body, 40) }}</p>
                         @endif
                     </div>
                 </div>
@@ -36,11 +36,11 @@
                     @if($project->messages->first())
                         <span class="text-xs text-ink-muted">{{ $project->messages->first()->created_at->diffForHumans() }}</span>
                     @endif
-                    <i data-lucide="chevron-right" class="w-5 h-5 text-ink-muted"></i>
+                    <i data-lucide="chevron-left" class="w-5 h-5 text-ink-muted"></i>
                 </div>
             </a>
         @empty
-            <div class="px-6 py-16 text-center text-ink-muted">
+            <div class="px-4 sm:px-6 py-16 text-center text-ink-muted">
                 {{ __('no_conversations') }}
             </div>
         @endforelse

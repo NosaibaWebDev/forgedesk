@@ -11,14 +11,14 @@ class ClientOnly
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user()->isClient()) {
-            return redirect()->route('login')->with('error', 'אין לך גישה לאזור זה.');
+            return redirect()->route('login')->with('error', __('auth.access_denied'));
         }
 
         if (!$request->user()->is_active) {
             auth()->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('login')->with('error', 'החשבון שלך הושבת. אנא פנה למנהל.');
+            return redirect()->route('login')->with('error', __('auth.account_disabled'));
         }
 
         return $next($request);

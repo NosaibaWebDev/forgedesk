@@ -380,5 +380,16 @@
   "server_error_desc": "אירעה שגיאה בשרת. אנא נסה שוב מאוחר יותר.",
   "session_expired": "הSession פג",
   "session_expired_desc": "הsesion שלך פג. אנא התחבר מחדש.",
-  "back_to_home": "חזרה לדף הבית"
+  "back_to_home": "חזרה לדף הבית",
+  "lang_short_he": "עב",
+  "lang_short_ar": "عر",
+  "lang_hebrew": "עברית",
+  "lang_arabic": "العربية",
+  "from_date": "מתאריך",
+  "to_date": "עד תאריך",
+  "close_menu": "סגור תפריט",
+  "auth.access_denied": "אין לך גישה לאזור זה.",
+  "auth.account_disabled": "החשבון שלך הושבת. אנא פנה למנהל.",
+  "timer_already_stopped": "הטיימר כבר הופסק.",
+  "auth.password_incorrect": "הסיסמה אינה נכונה."
 }

@@ -16,7 +16,7 @@ $sizeMap = [
 $variants = [
     'accent' => 'bg-accent/10 text-accent',
     'green' => 'bg-green-50 text-green-600',
-    'white' => 'bg-white text-accent border border-border',
+    'white' => 'bg-white dark:bg-gray-800 text-accent border border-border',
 ];
 $sizeData = $sizeMap[$size] ?? $sizeMap['md'];
 $sizeClass = $sizeData['class'];

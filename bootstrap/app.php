@@ -18,7 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
-        $middleware->trustProxies(at: '*');
+        $middleware->trustProxies(at: ['127.0.0.1']);
+        if ($trustAll = env('TRUST_ALL_PROXIES', false)) {
+            $middleware->trustProxies(at: '*');
+        }
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

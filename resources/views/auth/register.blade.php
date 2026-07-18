@@ -86,7 +86,7 @@
                         name="email"
                         value="{{ old('email') }}"
                         required
-                        class="input text-right"
+                        class="input" dir="ltr"
                         placeholder="example@email.com"
                     >
                 </div>
