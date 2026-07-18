@@ -20,6 +20,8 @@ class LanguageController extends Controller
             session(['preferred_language' => $locale]);
         }
 
+        app()->setLocale($locale);
+
         $fallback = '/';
         if (Auth::check()) {
             $fallback = Auth::user()->isAdmin() ? route('admin.dashboard') : route('client.dashboard');
