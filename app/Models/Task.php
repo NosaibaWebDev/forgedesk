@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Priority;
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +29,8 @@ class Task extends Model
     protected function casts(): array
     {
         return [
+            'status' => TaskStatus::class,
+            'priority' => Priority::class,
             'due_date' => 'date',
         ];
     }
@@ -51,25 +55,38 @@ class Task extends Model
         return $this->hasMany(TaskImage::class)->latest();
     }
 
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            'pending' => 'ממתין',
-            'in_progress' => 'בתהליך',
-            'review' => 'בבדיקה',
-            'completed' => 'הושלם',
-            default => $this->status,
-        };
+        return $this->status->label();
     }
 
     public function getPriorityLabelAttribute(): string
     {
-        return match ($this->priority) {
-            'low' => 'נמוכה',
-            'medium' => 'בינונית',
-            'high' => 'גבוהה',
-            'urgent' => 'דחופה',
-            default => $this->priority,
-        };
+        return $this->priority->label();
+    }
+
+    public function cycleStatus(): void
+    {
+        $this->update(['status' => $this->status->next()]);
+    }
+
+    public function scopeByStatus($query, TaskStatus $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeUrgent($query)
+    {
+        return $query->where('priority', Priority::Urgent);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->whereIn('status', [TaskStatus::Pending, TaskStatus::InProgress]);
     }
 }

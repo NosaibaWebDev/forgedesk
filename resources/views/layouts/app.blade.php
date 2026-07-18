@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-theme="light">
+<html lang="{{ $currentLocale ?? 'he' }}" dir="{{ ($currentLocale ?? 'he') === 'ar' ? 'rtl' : 'rtl' }}" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +7,10 @@
     <meta name="theme-color" content="#17C3B2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="/manifest.json">
-    <title>@yield('title', 'ForgeDesk Studio')</title>
+    <title>@yield('title', \App\Models\Setting::get('app_name', 'ForgeDesk Studio'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/app.css">
     <script>
         (function() {
@@ -25,13 +24,13 @@
         })();
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
     <script>
         tailwind.config = {
             darkMode: ['selector', '[data-theme="dark"]'],
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Open Sans', 'system-ui', 'sans-serif'] },
+                    fontFamily: { sans: ['Open Sans', 'Noto Sans Arabic', 'system-ui', 'sans-serif'] },
                     colors: {
                         accent: { DEFAULT:'#17C3B2', light:'#E6F9F7', dark:'#13A89A' },
                         surface: '#F7F9FC',
@@ -52,7 +51,7 @@
         }
     </script>
     @stack('styles')
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js" integrity="sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F" crossorigin="anonymous"></script>
 </head>
 <body class="min-h-screen font-sans transition-colors duration-200" style="background:var(--color-surface); color:var(--color-ink);">
     @auth
@@ -73,11 +72,40 @@
                     @hasSection('breadcrumbs')
                         @yield('breadcrumbs')
                     @else
-                        <h1 class="text-lg font-semibold" style="color:var(--color-ink);">@yield('header', 'ForgeDesk Studio')</h1>
+                        <h1 class="text-lg font-semibold" style="color:var(--color-ink);">@yield('header', \App\Models\Setting::get('app_name', 'ForgeDesk Studio'))</h1>
                     @endif
                 </div>
                 <div class="flex items-center gap-3">
                     @yield('actions')
+                    @auth
+                    <div x-data="{ langOpen: false }" class="relative">
+                        <button @click="langOpen = !langOpen" @keydown.escape="langOpen = false"
+                                class="flex items-center gap-1.5 px-3 py-2.5 rounded-btn text-sm font-medium transition border"
+                                style="color:var(--color-ink-secondary); border-color:var(--color-border); background:var(--color-bg);">
+                            <i data-lucide="globe" class="w-4 h-4"></i>
+                            <span>{{ $currentLocale === 'ar' ? 'عر' : 'עב' }}</span>
+                            <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                        </button>
+                        <div x-show="langOpen" @click.away="langOpen = false" x-transition x-cloak
+                             class="absolute top-full mt-2 left-0 w-40 rounded-card py-1 z-50 shadow-elevated"
+                             style="background:var(--color-card); border:1px solid var(--color-border);">
+                            <a href="{{ route('language.switch', 'he') }}"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm transition"
+                               style="color:{{ $currentLocale === 'he' ? 'var(--color-accent)' : 'var(--color-ink)' }};">
+                                <i data-lucide="globe" class="w-4 h-4 flex-shrink-0" style="color:var(--color-ink-muted)"></i>
+                                <span class="font-medium">עברית</span>
+                                @if($currentLocale === 'he')<i data-lucide="check" class="w-4 h-4 ms-auto" style="color:var(--color-accent)"></i>@endif
+                            </a>
+                            <a href="{{ route('language.switch', 'ar') }}"
+                               class="flex items-center gap-2 px-4 py-2.5 text-sm transition"
+                               style="color:{{ $currentLocale === 'ar' ? 'var(--color-accent)' : 'var(--color-ink)' }};">
+                                <i data-lucide="globe" class="w-4 h-4 flex-shrink-0" style="color:var(--color-ink-muted)"></i>
+                                <span class="font-medium">العربية</span>
+                                @if($currentLocale === 'ar')<i data-lucide="check" class="w-4 h-4 ms-auto" style="color:var(--color-accent)"></i>@endif
+                            </a>
+                        </div>
+                    </div>
+                    @endauth
                 </div>
             </header>
 
@@ -142,11 +170,6 @@
             }
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-        }
     </script>
     @stack('scripts')
 </body>

@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'עריכת פרויקט - מנהל')
+@section('title', __('edit_project'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <a href="{{ route('admin.projects.index') }}" class="text-ink-muted hover:text-accent transition">פרויקטים</a>
+    <a href="{{ route('admin.projects.index') }}" class="text-ink-muted hover:text-accent transition">{{ __('projects') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
     <a href="{{ route('admin.projects.show', $project) }}" class="text-ink-muted hover:text-accent transition">{{ $project->title }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">עריכה</span>
+    <span class="text-ink font-medium">{{ __('edit') }}</span>
 </nav>
 @endsection
 
@@ -21,17 +21,17 @@
             @method('PUT')
 
             <div class="mb-4">
-                <label for="title" class="label">שם הפרויקט *</label>
+                <label for="title" class="label">{{ __('project_name') }} *</label>
                 <input type="text" id="title" name="title" value="{{ old('title', $project->title) }}" required
                     class="input">
                 @error('title') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
             </div>
 
             <div class="mb-4">
-                <label for="user_id" class="label">לקוח *</label>
+                <label for="user_id" class="label">{{ __('client') }} *</label>
                 <select id="user_id" name="user_id" required
                     class="input">
-                    <option value="">בחר לקוח</option>
+                    <option value="">{{ __('select_client') }}</option>
                     @foreach($clients as $client)
                         <option value="{{ $client->id }}" {{ old('user_id', $project->user_id) == $client->id ? 'selected' : '' }}>
                             {{ $client->name }} - {{ $client->email }}
@@ -42,7 +42,7 @@
             </div>
 
             <div class="mb-4">
-                <label for="description" class="label">תיאור</label>
+                <label for="description" class="label">{{ __('description') }}</label>
                 <textarea id="description" name="description" rows="4"
                     class="input">{{ old('description', $project->description) }}</textarea>
                 @error('description') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -50,26 +50,26 @@
 
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label for="status" class="label">סטטוס *</label>
+                    <label for="status" class="label">{{ __('status') }} *</label>
                     <select id="status" name="status" required
                         class="input">
-                        <option value="pending" {{ old('status', $project->status) === 'pending' ? 'selected' : '' }}>ממתין</option>
-                        <option value="in_progress" {{ old('status', $project->status) === 'in_progress' ? 'selected' : '' }}>בתהליך</option>
-                        <option value="review" {{ old('status', $project->status) === 'review' ? 'selected' : '' }}>בבדיקה</option>
-                        <option value="completed" {{ old('status', $project->status) === 'completed' ? 'selected' : '' }}>הושלם</option>
-                        <option value="cancelled" {{ old('status', $project->status) === 'cancelled' ? 'selected' : '' }}>בוטל</option>
+                        <option value="pending" {{ old('status', $project->status->value) === 'pending' ? 'selected' : '' }}>{{ __('pending') }}</option>
+                        <option value="in_progress" {{ old('status', $project->status->value) === 'in_progress' ? 'selected' : '' }}>{{ __('in_progress') }}</option>
+                        <option value="review" {{ old('status', $project->status->value) === 'review' ? 'selected' : '' }}>{{ __('review') }}</option>
+                        <option value="completed" {{ old('status', $project->status->value) === 'completed' ? 'selected' : '' }}>{{ __('completed') }}</option>
+                        <option value="cancelled" {{ old('status', $project->status->value) === 'cancelled' ? 'selected' : '' }}>{{ __('cancelled') }}</option>
                     </select>
                     @error('status') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label for="priority" class="label">עדיפות *</label>
+                    <label for="priority" class="label">{{ __('priority') }} *</label>
                     <select id="priority" name="priority" required
                         class="input">
-                        <option value="low" {{ old('priority', $project->priority) === 'low' ? 'selected' : '' }}>נמוכה</option>
-                        <option value="medium" {{ old('priority', $project->priority) === 'medium' ? 'selected' : '' }}>בינונית</option>
-                        <option value="high" {{ old('priority', $project->priority) === 'high' ? 'selected' : '' }}>גבוהה</option>
-                        <option value="urgent" {{ old('priority', $project->priority) === 'urgent' ? 'selected' : '' }}>דחופה</option>
+                        <option value="low" {{ old('priority', $project->priority->value) === 'low' ? 'selected' : '' }}>{{ __('priority_low') }}</option>
+                        <option value="medium" {{ old('priority', $project->priority->value) === 'medium' ? 'selected' : '' }}>{{ __('priority_medium') }}</option>
+                        <option value="high" {{ old('priority', $project->priority->value) === 'high' ? 'selected' : '' }}>{{ __('priority_high') }}</option>
+                        <option value="urgent" {{ old('priority', $project->priority->value) === 'urgent' ? 'selected' : '' }}>{{ __('priority_urgent') }}</option>
                     </select>
                     @error('priority') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
@@ -77,30 +77,51 @@
 
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label for="budget" class="label">תקציב (₪)</label>
+                    <label for="budget" class="label">{{ __('budget') }} (₪)</label>
                     <input type="number" id="budget" name="budget" value="{{ old('budget', $project->budget) }}" min="0" step="0.01"
                         class="input">
                     @error('budget') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label for="paid_amount" class="label">סכום שולם (₪)</label>
+                    <label for="paid_amount" class="label">{{ __('paid_amount') }} (₪)</label>
                     <input type="number" id="paid_amount" name="paid_amount" value="{{ old('paid_amount', $project->paid_amount) }}" min="0" step="0.01"
                         class="input">
                     @error('paid_amount') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
             </div>
 
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="hourly_rate" class="label">{{ __('hourly_rate') }} (₪)</label>
+                    <input type="number" id="hourly_rate" name="hourly_rate" value="{{ old('hourly_rate', $project->hourly_rate) }}" min="0" step="0.01"
+                        class="input" placeholder="0">
+                    @error('hourly_rate') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="estimated_hours" class="label">{{ __('estimated_hours') }}</label>
+                    <input type="number" id="estimated_hours" name="estimated_hours" value="{{ old('estimated_hours', $project->estimated_hours) }}" min="0" step="0.5"
+                        class="input" placeholder="0">
+                    @error('estimated_hours') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="label">{{ __('estimated_total') }} (₪)</label>
+                    <div class="input bg-gray-50 flex items-center font-semibold" id="total-price-display">-</div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label for="start_date" class="label">תאריך התחלה</label>
+                    <label for="start_date" class="label">{{ __('start_date') }}</label>
                     <input type="date" id="start_date" name="start_date" value="{{ old('start_date', $project->start_date?->format('Y-m-d')) }}"
                         class="input">
                     @error('start_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label for="due_date" class="label">תאריך יעד</label>
+                    <label for="due_date" class="label">{{ __('due_date') }}</label>
                     <input type="date" id="due_date" name="due_date" value="{{ old('due_date', $project->due_date?->format('Y-m-d')) }}"
                         class="input">
                     @error('due_date') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -108,7 +129,7 @@
             </div>
 
             <div class="mb-6">
-                <label for="notes" class="label">הערות</label>
+                <label for="notes" class="label">{{ __('notes') }}</label>
                 <textarea id="notes" name="notes" rows="3"
                     class="input">{{ old('notes', $project->notes) }}</textarea>
                 @error('notes') <p class="text-danger text-xs mt-1.5">{{ $message }}</p> @enderror
@@ -116,13 +137,31 @@
 
             <div class="flex items-center gap-4">
                 <button type="submit" class="btn-primary">
-                    עדכן פרויקט
+                    {{ __('save') }}
                 </button>
                 <a href="{{ route('admin.projects.show', $project) }}" class="btn-ghost">
-                    ביטול
+                    {{ __('cancel') }}
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const rateInput = document.getElementById('hourly_rate');
+    const hoursInput = document.getElementById('estimated_hours');
+    const totalDisplay = document.getElementById('total-price-display');
+
+    function updateTotal() {
+        const rate = parseFloat(rateInput.value) || 0;
+        const hours = parseFloat(hoursInput.value) || 0;
+        totalDisplay.textContent = rate && hours ? '₪' + (rate * hours).toLocaleString('he-IL', {minimumFractionDigits: 2}) : '-';
+    }
+
+    rateInput.addEventListener('input', updateTotal);
+    hoursInput.addEventListener('input', updateTotal);
+    updateTotal();
+</script>
+@endpush
 @endsection

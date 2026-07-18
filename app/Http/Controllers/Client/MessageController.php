@@ -27,7 +27,9 @@ class MessageController extends Controller
             ->latest()
             ->get();
 
-        return view('client.messages.index', compact('conversations'));
+        $projects = Project::forClient($userId)->latest()->get();
+
+        return view('client.messages.index', compact('conversations', 'projects'));
     }
 
     public function show(Project $project)
@@ -49,6 +51,8 @@ class MessageController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        \Illuminate\Support\Facades\Cache::forget("user_{$userId}_unread_messages");
+
         return view('client.messages.show', compact('project', 'messages'));
     }
 
@@ -60,7 +64,11 @@ class MessageController extends Controller
             'body' => 'required|string|max:5000',
         ]);
 
-        $adminId = \App\Models\User::where('role', 'admin')->first()->id;
+        $adminId = $project->user->admin_id ?? null;
+
+        if (!$adminId) {
+            return back()->with('error', __('no_admin_found'));
+        }
 
         Message::create([
             'project_id' => $project->id,
@@ -71,6 +79,6 @@ class MessageController extends Controller
         ]);
 
         return redirect()->route('client.messages.show', $project)
-            ->with('success', 'ההודעה נשלחה בהצלחה.');
+            ->with('success', __('message_sent'));
     }
 }

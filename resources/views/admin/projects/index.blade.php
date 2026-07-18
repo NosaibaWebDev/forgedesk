@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'פרויקטים - מנהל')
+@section('title', __('projects_list'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">פרויקטים</span>
+    <span class="text-ink font-medium">{{ __('projects') }}</span>
 </nav>
 @endsection
 
@@ -14,16 +14,16 @@
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" @click.outside="open = false" class="btn-ghost inline-flex items-center gap-2">
             <i data-lucide="download" class="w-4 h-4"></i>
-            ייצוא
+            {{ __('export') }}
             <i data-lucide="chevron-down" class="w-3 h-3"></i>
         </button>
         <div x-show="open" x-transition x-cloak class="absolute left-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
-            <a href="{{ route('admin.projects.export.csv') }}" class="dropdown-item"><i data-lucide="file-text"></i>ייצוא CSV</a>
-            <a href="{{ route('admin.projects.export.pdf') }}" class="dropdown-item" target="_blank"><i data-lucide="file"></i>ייצוא PDF</a>
+            <a href="{{ route('admin.projects.export.csv') }}" class="dropdown-item"><i data-lucide="file-text"></i>{{ __('export_csv') }}</a>
+            <a href="{{ route('admin.projects.export.pdf') }}" class="dropdown-item" target="_blank"><i data-lucide="file"></i>{{ __('export_pdf') }}</a>
         </div>
     </div>
     <a href="{{ route('admin.projects.create') }}" class="btn-primary">
-        + פרויקט חדש
+        + {{ __('new_project') }}
     </a>
 </div>
 @endsection
@@ -31,7 +31,7 @@
 @section('content')
 <div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
     <div class="px-6 py-5 border-b border-border">
-        <h2 class="text-lg font-semibold text-ink">רשימת פרויקטים</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ __('projects_list') }}</h2>
     </div>
 
     {{-- Desktop table --}}
@@ -39,13 +39,13 @@
         <table class="w-full text-right">
             <thead>
                 <tr class="border-b border-border">
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">שם הפרויקט</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">לקוח</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">סטטוס</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">עדיפות</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">התקדמות</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">תאריך יעד</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">פעולות</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('project_name') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('client') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('priority') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('progress') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('due_date') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border">
@@ -65,7 +65,7 @@
                                     'cancelled' => 'bg-red-50 text-red-700 ring-red-600/20',
                                 ];
                             @endphp
-                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
+                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status->value] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
                                 {{ $project->status_label }}
                             </span>
                         </td>
@@ -75,10 +75,10 @@
                                     'low' => 'text-ink-muted',
                                     'medium' => 'text-amber-600',
                                     'high' => 'text-orange-600',
-                                    'urgent' => 'text-red-600',
+'urgent' => 'text-danger',
                                 ];
                             @endphp
-                            <span class="text-sm font-medium {{ $priorityColors[$project->priority] ?? '' }}">
+                            <span class="text-sm font-medium {{ $priorityColors[$project->priority->value] ?? '' }}">
                                 {{ $project->priority_label }}
                             </span>
                         </td>
@@ -95,7 +95,7 @@
                         </td>
                         <td class="px-6 py-5">
                             <div class="flex items-center gap-3">
-                                <a href="{{ route('admin.projects.edit', $project) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition" onclick="event.stopPropagation()">עריכה</a>
+                                <a href="{{ route('admin.projects.edit', $project) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition" onclick="event.stopPropagation()">{{ __('edit') }}</a>
                             </div>
                         </td>
                     </tr>
@@ -104,7 +104,7 @@
                         <td colspan="7" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <i data-lucide="folder-open" class="w-10 h-10 text-ink-muted/40"></i>
-                                <p class="text-ink-muted text-sm">אין פרויקטים עדיין.</p>
+                                <p class="text-ink-muted text-sm">{{ __('no_projects') }}</p>
                             </div>
                         </td>
                     </tr>
@@ -131,7 +131,7 @@
                             'cancelled' => 'bg-red-50 text-red-700 ring-red-600/20',
                         ];
                     @endphp
-                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
+                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status->value] ?? 'bg-gray-50 text-gray-700 ring-gray-600/20' }}">
                         {{ $project->status_label }}
                     </span>
                 </div>
@@ -144,7 +144,7 @@
                             'urgent' => 'text-red-600',
                         ];
                     @endphp
-                    <span class="font-medium {{ $priorityColors[$project->priority] ?? '' }}">
+                    <span class="font-medium {{ $priorityColors[$project->priority->value] ?? '' }}">
                         {{ $project->priority_label }}
                     </span>
                     <span class="text-ink-secondary">
@@ -158,14 +158,14 @@
                     <span class="text-xs text-ink-muted font-medium">{{ $project->progress }}%</span>
                 </div>
                 <div class="flex items-center justify-end">
-                    <span class="text-sm text-ink-secondary font-medium transition">עריכה</span>
+                    <span class="text-sm text-ink-secondary font-medium transition">{{ __('edit') }}</span>
                 </div>
             </a>
         @empty
             <div class="px-6 py-16 text-center">
                 <div class="flex flex-col items-center gap-2">
                     <i data-lucide="folder-open" class="w-10 h-10 text-ink-muted/40"></i>
-                    <p class="text-ink-muted text-sm">אין פרויקטים עדיין.</p>
+                    <p class="text-ink-muted text-sm">{{ __('no_projects') }}</p>
                 </div>
             </div>
         @endforelse

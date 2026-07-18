@@ -108,6 +108,11 @@ nginx -t && systemctl reload nginx
 cp "$APP_ROOT/.deploy/forgedesk-worker.conf" "/etc/supervisor/conf.d/"
 supervisorctl reread && supervisorctl update
 
+# Scheduler cron
+echo "[8b] Setting up scheduler cron..."
+CRON_LINE="* * * * * cd $APP_ROOT && php artisan schedule:run >> /dev/null 2>&1"
+(sudo -u www-data crontab -l 2>/dev/null | grep -v 'schedule:run'; echo "$CRON_LINE") | sudo -u www-data crontab -
+
 # SSL certificate
 echo ""
 echo "=== SSL SETUP ==="

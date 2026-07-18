@@ -1,3 +1,4 @@
+[x-cloak] { display: none !important; }
 :root {
     --sidebar-w: 260px;
     --sidebar-w-collapsed: 76px;
@@ -58,6 +59,10 @@
 }
 
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+html[lang="ar"] body, html[lang="ar"] .input, html[lang="ar"] select, html[lang="ar"] textarea, html[lang="ar"] button, html[lang="ar"] a, html[lang="ar"] p, html[lang="ar"] span, html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4, html[lang="ar"] h5, html[lang="ar"] h6, html[lang="ar"] label, html[lang="ar"] td, html[lang="ar"] th, html[lang="ar"] option {
+    font-family: 'Noto Sans Arabic', 'Open Sans', system-ui, sans-serif;
+}
 
 .input { width:100%; padding:0.75rem 1rem; border:1px solid var(--color-input-border); border-radius:12px; font-size:0.875rem; line-height:1.25rem; color:var(--color-ink); background:var(--color-input-bg); transition:all 0.15s; }
 .input::placeholder { color:var(--color-input-placeholder); }
@@ -122,14 +127,29 @@ input[type="date"].input, input[type="time"].input { padding-left:2.5rem; color-
     #main-content.sidebar-collapsed { margin-right: var(--sidebar-w-collapsed); }
     html.sidebar-was-collapsed #sidebar { width: var(--sidebar-w-collapsed) !important; }
     html.sidebar-was-collapsed #main-content { margin-right: var(--sidebar-w-collapsed) !important; }
+    html.sidebar-was-collapsed #sidebar .sidebar-brand-text { opacity: 0; width: 0; overflow: hidden; }
+    html.sidebar-was-collapsed #sidebar .nav-label { opacity: 0; width: 0; overflow: hidden; }
+    html.sidebar-was-collapsed #sidebar .sidebar-user-info { opacity: 0; width: 0; overflow: hidden; }
+    html.sidebar-was-collapsed #sidebar .sidebar-logout-text { display: none; }
+    html.sidebar-was-collapsed #sidebar .nav-badge { display: none; }
+    html.sidebar-was-collapsed #sidebar .sidebar-user-info-parent { justify-content: center; }
+    html.sidebar-was-collapsed #sidebar .nav-item { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; gap: 0 !important; }
 }
 
 /* Dark mode: override common Tailwind utilities */
+[data-theme="dark"] svg { color: var(--color-ink-secondary); }
 [data-theme="dark"] .bg-white { background-color: var(--color-card) !important; }
 [data-theme="dark"] .bg-gray-50 { background-color: var(--color-nav-hover) !important; }
 [data-theme="dark"] .bg-gray-100 { background-color: var(--color-elevated) !important; }
 [data-theme="dark"] .bg-surface { background-color: var(--color-surface) !important; }
 [data-theme="dark"] .bg-red-50 { background-color: rgba(239,68,68,.12) !important; }
+[data-theme="dark"] .bg-green-50 { background-color: rgba(34,197,94,.12) !important; }
+[data-theme="dark"] .bg-emerald-50 { background-color: rgba(16,185,129,.12) !important; }
+[data-theme="dark"] .bg-blue-50 { background-color: rgba(59,130,246,.12) !important; }
+[data-theme="dark"] .bg-violet-50 { background-color: rgba(139,92,246,.12) !important; }
+[data-theme="dark"] .bg-purple-50 { background-color: rgba(168,85,247,.12) !important; }
+[data-theme="dark"] .bg-amber-50 { background-color: rgba(245,158,11,.12) !important; }
+[data-theme="dark"] .bg-yellow-50 { background-color: rgba(234,179,8,.12) !important; }
 
 [data-theme="dark"] .border-border { border-color: var(--color-border) !important; }
 [data-theme="dark"] .border-gray-200 { border-color: var(--color-border) !important; }
@@ -144,9 +164,26 @@ input[type="date"].input, input[type="time"].input { padding-left:2.5rem; color-
 [data-theme="dark"] .text-gray-800 { color: var(--color-ink) !important; }
 [data-theme="dark"] .text-gray-900 { color: var(--color-ink) !important; }
 [data-theme="dark"] .text-red-700 { color: var(--color-danger) !important; }
+[data-theme="dark"] .text-green-600 { color: #4ade80 !important; }
+[data-theme="dark"] .text-green-700 { color: #4ade80 !important; }
+[data-theme="dark"] .text-emerald-700 { color: #34d399 !important; }
+[data-theme="dark"] .text-blue-700 { color: #60a5fa !important; }
+[data-theme="dark"] .text-violet-700 { color: #a78bfa !important; }
+[data-theme="dark"] .text-purple-700 { color: #c084fc !important; }
+[data-theme="dark"] .text-amber-600 { color: #fbbf24 !important; }
+[data-theme="dark"] .text-amber-700 { color: #fbbf24 !important; }
+[data-theme="dark"] .text-yellow-700 { color: #facc15 !important; }
+[data-theme="dark"] .text-orange-600 { color: #fb923c !important; }
+[data-theme="dark"] .text-orange-700 { color: #fb923c !important; }
 
 [data-theme="dark"] .ring-border { --tw-ring-color: var(--color-border); }
 [data-theme="dark"] .ring-2 { --tw-ring-color: var(--color-border); }
+[data-theme="dark"] .ring-amber-600\/20 { --tw-ring-color: rgba(245,158,11,.25); }
+[data-theme="dark"] .ring-blue-600\/20 { --tw-ring-color: rgba(59,130,246,.25); }
+[data-theme="dark"] .ring-violet-600\/20 { --tw-ring-color: rgba(139,92,246,.25); }
+[data-theme="dark"] .ring-emerald-600\/20 { --tw-ring-color: rgba(16,185,129,.25); }
+[data-theme="dark"] .ring-red-600\/20 { --tw-ring-color: rgba(239,68,68,.25); }
+[data-theme="dark"] .ring-inset { --tw-ring-inset: inset; }
 
 [data-theme="dark"] .shadow-card { box-shadow: 0 1px 2px rgba(0,0,0,.2), 0 4px 12px rgba(0,0,0,.15) !important; }
 [data-theme="dark"] .shadow-elevated { box-shadow: 0 4px 16px rgba(0,0,0,.25) !important; }

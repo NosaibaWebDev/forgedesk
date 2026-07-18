@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -26,27 +27,25 @@ class ClientController extends Controller
         return view('admin.clients.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreClientRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:20',
-            'company' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:500',
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/'],
-        ], [
-            'password.regex' => 'הסיסמה חייבת לכלול לפחות אות אחת ומספר אחד.',
+        $validated = $request->validated();
+
+        $client = new User();
+        $client->forceFill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'company' => $validated['company'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'password' => Hash::make($validated['password']),
+            'role' => 'client',
+            'admin_id' => auth()->id(),
+            'is_active' => true,
         ]);
+        $client->save();
 
-        $validated['role'] = 'client';
-        $validated['admin_id'] = auth()->id();
-        $validated['password'] = Hash::make($validated['password']);
-        $validated['is_active'] = true;
-
-        $client = User::create($validated);
-
-        return redirect()->route('admin.clients.show', $client)->with('success', 'הלקוח נוצר בהצלחה.');
+        return redirect()->route('admin.clients.show', $client)->with('success', __('client_created'));
     }
 
     public function show(User $client)
@@ -66,22 +65,18 @@ class ClientController extends Controller
         return view('admin.clients.edit', compact('client'));
     }
 
-    public function update(Request $request, User $client)
+    public function update(UpdateClientRequest $request, User $client)
     {
         abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $client->id,
-            'phone' => 'nullable|string|max:20',
-            'company' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:500',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
+        $isActive = $validated['is_active'] ?? $client->is_active;
+        unset($validated['is_active']);
 
         $client->update($validated);
+        $client->forceFill(['is_active' => $isActive])->save();
 
-        return redirect()->route('admin.clients.show', $client)->with('success', 'פרטי הלקוח עודכנו.');
+        return redirect()->route('admin.clients.show', $client)->with('success', __('client_updated'));
     }
 
     public function destroy(User $client)
@@ -89,10 +84,10 @@ class ClientController extends Controller
         abort_unless($client->isClient() && $client->admin_id === auth()->id(), 404);
 
         if ($client->projects()->count() > 0) {
-            return back()->with('error', 'לא ניתן למחוק לקוח עם פרויקטים קיימים.');
+            return back()->with('error', __('client_has_projects'));
         }
 
         $client->delete();
-        return redirect()->route('admin.clients.index')->with('success', 'הלקוח נמחק.');
+        return redirect()->route('admin.clients.index')->with('success', __('client_deleted'));
     }
 }

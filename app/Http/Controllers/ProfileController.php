@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdatePasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
@@ -14,17 +14,10 @@ class ProfileController extends Controller
         return view('profile.edit', ['user' => Auth::user()]);
     }
 
-    public function update(Request $request)
+    public function update(UpdateProfileRequest $request)
     {
         $user = Auth::user();
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'company' => ['nullable', 'string', 'max:255'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
@@ -36,23 +29,16 @@ class ProfileController extends Controller
         $user->update($validated);
         Auth::setUser($user->fresh());
 
-        return redirect()->route('profile.edit')->with('success', 'החשבון עודכן בהצלחה');
+        return redirect()->route('profile.edit')->with('success', __('profile_updated'));
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/'],
-        ], [
-            'password.regex' => 'הסיסמה חייבת לכלול לפחות אות אחת ומספר אחד.',
-        ]);
-
         Auth::user()->update([
             'password' => $request->password,
         ]);
 
-        return redirect()->route('profile.edit')->with('success', 'הסיסמה עודכנה בהצלחה');
+        return redirect()->route('profile.edit')->with('success', __('password_updated'));
     }
 
     public function destroyAvatar()
@@ -64,6 +50,6 @@ class ProfileController extends Controller
             $user->update(['avatar' => null]);
         }
 
-        return redirect()->route('profile.edit')->with('success', 'התמונה הוסרה');
+        return redirect()->route('profile.edit')->with('success', __('image_removed'));
     }
 }

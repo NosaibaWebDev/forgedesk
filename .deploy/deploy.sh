@@ -9,35 +9,39 @@ WEB_USER="www-data"
 echo "=== ForgeDesk Studio Deployment ==="
 
 # 1. Set correct file ownership
-echo "[1/6] Setting file ownership..."
+echo "[1/7] Setting file ownership..."
 sudo chown -R "$WEB_USER:$WEB_USER" "$APP_ROOT"
 
 # 2. Set secure file permissions
-echo "[2/6] Setting file permissions..."
+echo "[2/7] Setting file permissions..."
 find "$APP_ROOT" -type f -exec chmod 644 {} \;
 find "$APP_ROOT" -type d -exec chmod 755 {} \;
 chmod -R 775 "$APP_ROOT/storage"
 chmod -R 775 "$APP_ROOT/bootstrap/cache"
-chmod +x artisan
+chmod +x "$APP_ROOT/artisan"
 
 # 3. Install dependencies (production only)
-echo "[3/6] Installing composer dependencies..."
+echo "[3/7] Installing composer dependencies..."
 cd "$APP_ROOT"
 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# 4. Run database migrations
-echo "[4/6] Running database migrations..."
+# 4. Backup database before migration
+echo "[4/7] Creating pre-deploy backup..."
+php artisan backup:database 2>/dev/null || echo "  Warning: backup skipped (backup command not available or failed)"
+
+# 5. Run database migrations
+echo "[5/7] Running database migrations..."
 php artisan migrate --force --no-interaction
 
-# 5. Build caches
-echo "[5/6] Building caches..."
+# 6. Build caches
+echo "[6/7] Building caches..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
-# 6. Restart queue workers
-echo "[6/6] Restarting queue workers..."
+# 7. Restart queue workers
+echo "[7/7] Restarting queue workers..."
 php artisan queue:restart
 
 echo "=== Deployment complete ==="

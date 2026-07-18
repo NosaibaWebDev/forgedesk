@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'הודעות - מנהל')
+@section('title', __('messages'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">הודעות</span>
+    <span class="text-ink font-medium">{{ __('messages') }}</span>
 </nav>
 @endsection
 
 @section('content')
 <div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
     <div class="px-6 py-5 border-b border-border">
-        <h2 class="text-lg font-semibold text-ink">רשימת שיחות</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ __('messages_list') }}</h2>
     </div>
     <div class="divide-y divide-border">
         @forelse($conversations as $project)
@@ -41,7 +41,7 @@
             </a>
         @empty
             <div class="px-6 py-16 text-center text-ink-muted">
-                אין שיחות עדיין.
+                {{ __('no_conversations') }}
             </div>
         @endforelse
     </div>

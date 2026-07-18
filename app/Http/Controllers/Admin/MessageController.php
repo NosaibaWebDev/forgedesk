@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SendMessageRequest;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
@@ -50,28 +50,26 @@ class MessageController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
+        \Illuminate\Support\Facades\Cache::forget("user_{$adminId}_unread_messages");
+
         $client = $project->user;
 
         return view('admin.messages.show', compact('project', 'messages', 'client'));
     }
 
-    public function store(Request $request, Project $project)
+    public function store(SendMessageRequest $request, Project $project)
     {
         $this->authorize('view', $project);
-
-        $validated = $request->validate([
-            'body' => 'required|string|max:5000',
-        ]);
 
         Message::create([
             'project_id' => $project->id,
             'sender_id' => auth()->id(),
             'receiver_id' => $project->user_id,
-            'body' => $validated['body'],
+            'body' => $request->validated('body'),
             'is_read' => false,
         ]);
 
         return redirect()->route('admin.messages.show', $project)
-            ->with('success', 'ההודעה נשלחה בהצלחה.');
+            ->with('success', __('message_sent'));
     }
 }

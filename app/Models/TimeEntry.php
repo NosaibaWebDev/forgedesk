@@ -51,10 +51,23 @@ class TimeEntry extends Model
 
     public function getFormattedDurationAttribute(): string
     {
-        $totalMinutes = (int) $this->duration_minutes;
-        $hours = floor($totalMinutes / 60);
+        $totalMinutes = (int) round($this->duration_minutes);
+        $hours = intdiv($totalMinutes, 60);
         $minutes = $totalMinutes % 60;
-        return sprintf('%02d:%02d', $hours, $minutes);
+
+        if ($hours === 0 && $minutes === 0) {
+            return '0m';
+        }
+
+        if ($hours === 0) {
+            return $minutes . 'm';
+        }
+
+        if ($minutes === 0) {
+            return $hours . 'h';
+        }
+
+        return $hours . 'h ' . $minutes . 'm';
     }
 
     public function scopeForUser($query, int $userId)
@@ -67,8 +80,13 @@ class TimeEntry extends Model
         return $query->where('is_running', true);
     }
 
-    public function scopeForDate($query, $date)
+    public function scopeForDate($query, string $date)
     {
-        return $query->where('date', $date);
+        return $query->whereDate('date', $date);
+    }
+
+    public function scopeForProject($query, int $projectId)
+    {
+        return $query->where('project_id', $projectId);
     }
 }

@@ -14,7 +14,7 @@ class SettingsController extends Controller
     {
         $settings = Setting::getMany([
             'app_name' => 'ForgeDesk Studio',
-            'app_tagline' => 'מערכת ניהול פרילנסרים',
+            'app_tagline' => __('default_tagline'),
             'app_logo' => '',
             'company_name' => '',
             'company_email' => '',
@@ -61,7 +61,7 @@ class SettingsController extends Controller
             Setting::set($key, $value);
         }
 
-        return redirect()->route('admin.settings.index')->with('success', 'ההגדרות נשמרו בהצלחה.');
+        return redirect()->route('admin.settings.index')->with('success', __('settings_saved'));
     }
 
     public function clearLogo()
@@ -72,6 +72,6 @@ class SettingsController extends Controller
         }
         Setting::set('app_logo', '');
 
-        return redirect()->route('admin.settings.index')->with('success', 'הלוגו הוסר בהצלחה.');
+        return redirect()->route('admin.settings.index')->with('success', __('logo_deleted'));
     }
 }

@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', $client->name . ' - לקוח')
+@section('title', $client->name . ' - ' . __('client'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <a href="{{ route('admin.clients.index') }}" class="text-ink-muted hover:text-accent transition">לקוחות</a>
+    <a href="{{ route('admin.clients.index') }}" class="text-ink-muted hover:text-accent transition">{{ __('clients') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
     <span class="text-ink font-medium">{{ $client->name }}</span>
 </nav>
@@ -17,11 +17,11 @@
         @php $lastProject = $client->projects->sortByDesc('updated_at')->first(); @endphp
         <a href="{{ route('admin.messages.show', $lastProject) }}" class="btn-ghost">
             <i data-lucide="message-square" class="w-4 h-4"></i>
-            שלח הודעה
+            {{ __('send_message') }}
         </a>
     @endif
     <a href="{{ route('admin.clients.edit', $client) }}" class="btn-secondary">
-        ערוך
+        {{ __('edit_button') }}
     </a>
 </div>
 @endsection
@@ -39,30 +39,30 @@
             </div>
             <div class="mr-auto">
                 @if($client->is_active)
-                    <span class="rounded-badge px-3 py-1 text-xs font-medium bg-green-100 text-green-800">פעיל</span>
+                    <span class="rounded-badge px-3 py-1 text-xs font-medium bg-green-100 text-green-800">{{ __('active') }}</span>
                 @else
-                    <span class="rounded-badge px-3 py-1 text-xs font-medium bg-red-100 text-red-800">מושבת</span>
+                    <span class="rounded-badge px-3 py-1 text-xs font-medium bg-red-100 text-red-800">{{ __('inactive') }}</span>
                 @endif
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-                <p class="text-sm text-ink-muted">טלפון</p>
+                <p class="text-sm text-ink-muted">{{ __('phone') }}</p>
                 <p class="font-medium text-ink">{{ $client->phone ?? '-' }}</p>
             </div>
             <div>
-                <p class="text-sm text-ink-muted">חברה</p>
+                <p class="text-sm text-ink-muted">{{ __('company') }}</p>
                 <p class="font-medium text-ink">{{ $client->company ?? '-' }}</p>
             </div>
             <div>
-                <p class="text-sm text-ink-muted">כתובת</p>
+                <p class="text-sm text-ink-muted">{{ __('address') }}</p>
                 <p class="font-medium text-ink">{{ $client->address ?? '-' }}</p>
             </div>
         </div>
 
         <div class="mt-4 pt-4 border-t border-border">
-            <p class="text-sm text-ink-muted">תאריך רישום</p>
+            <p class="text-sm text-ink-muted">{{ __('registration_date') }}</p>
             <p class="font-medium text-ink">{{ $client->created_at->format('d/m/Y H:i') }}</p>
         </div>
     </div>
@@ -70,20 +70,20 @@
     {{-- Projects --}}
     <div class="bg-white rounded-card border border-border shadow-card">
         <div class="flex items-center justify-between p-6 border-b border-border">
-            <h3 class="text-lg font-semibold text-ink">פרויקטים ({{ $client->projects->count() }})</h3>
+            <h3 class="text-lg font-semibold text-ink">{{ __('projects') }} ({{ $client->projects->count() }})</h3>
             <a href="{{ route('admin.projects.create') }}" class="btn-primary btn-sm">
-                + פרויקט חדש
+                + {{ __('new_project_button') }}
             </a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-right">
                 <thead>
                     <tr class="border-b border-border">
-                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">שם הפרויקט</th>
-                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">סטטוס</th>
-                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">עדיפות</th>
-                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">התקדמות</th>
-                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">תאריך יעד</th>
+                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('project_name') }}</th>
+                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
+                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('priority') }}</th>
+                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('progress') }}</th>
+                        <th class="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('due_date') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border">
@@ -104,7 +104,7 @@
                                         'cancelled' => 'bg-red-50 text-red-700 ring-red-600/20',
                                     ];
                                 @endphp
-                                <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status] ?? '' }}">
+                                <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status->value] ?? '' }}">
                                     {{ $project->status_label }}
                                 </span>
                             </td>
@@ -126,7 +126,7 @@
                             <td colspan="5" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center gap-2">
                                     <i data-lucide="folder-open" class="w-10 h-10 text-ink-muted/40"></i>
-                                    <p class="text-ink-muted text-sm">אין פרויקטים עדיין.</p>
+                                    <p class="text-ink-muted text-sm">{{ __('no_projects') }}</p>
                                 </div>
                             </td>
                         </tr>

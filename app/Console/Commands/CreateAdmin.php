@@ -34,13 +34,15 @@ class CreateAdmin extends Command
 
         $password = $this->option('password') ?: Str::random(16);
 
-        User::create([
+        $admin = new User();
+        $admin->forceFill([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
             'role' => 'admin',
             'is_active' => true,
         ]);
+        $admin->save();
 
         $this->info('Admin user created.');
         $this->warn("Email: {$email}");

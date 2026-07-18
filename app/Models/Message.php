@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 
 class Message extends Model
 {
@@ -39,5 +40,25 @@ class Message extends Model
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+
+    public function scopeForProject($query, int $projectId)
+    {
+        return $query->where('project_id', $projectId);
+    }
+
+    public static function markAsRead(int $projectId, int $userId): void
+    {
+        static::where('project_id', $projectId)
+            ->where('receiver_id', $userId)
+            ->unread()
+            ->update(['is_read' => true]);
+
+        Cache::forget("user_{$userId}_unread_messages");
     }
 }

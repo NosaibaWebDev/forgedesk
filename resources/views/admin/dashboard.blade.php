@@ -1,18 +1,18 @@
 @extends('layouts.app')
 
-@section('title', 'לוח בקרה - מנהל')
+@section('title', __('admin_dashboard'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">לוח בקרה</span>
+    <span class="text-ink font-medium">{{ __('dashboard') }}</span>
 </nav>
 @endsection
 
 @section('actions')
 <a href="{{ route('admin.projects.create') }}" class="btn-primary inline-flex items-center gap-2">
     <i data-lucide="plus" class="w-4 h-4"></i>
-    פרויקט חדש
+    {{ __('new_project') }}
 </a>
 @endsection
 
@@ -20,52 +20,52 @@
 {{-- Stats Row --}}
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
     <a href="{{ route('admin.projects.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
-        <p class="text-xs text-ink-muted">פרויקטים</p>
+        <p class="text-xs text-ink-muted">{{ __('projects') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">{{ $totalProjects }}</p>
-        <p class="text-xs text-accent mt-1">{{ $activeProjects }} פעילים</p>
+        <p class="text-xs text-accent mt-1">{{ $activeProjects }} {{ __('active_projects') }}</p>
     </a>
     <a href="{{ route('admin.clients.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
-        <p class="text-xs text-ink-muted">לקוחות</p>
+        <p class="text-xs text-ink-muted">{{ __('clients') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">{{ $totalClients }}</p>
     </a>
     <div class="bg-white rounded-card border border-border shadow-card p-4">
-        <p class="text-xs text-ink-muted">משימות ממתינות</p>
+        <p class="text-xs text-ink-muted">{{ __('pending_tasks') }}</p>
         <p class="text-2xl font-bold text-orange-600 mt-1">{{ $pendingTasks }}</p>
     </div>
     <div class="bg-white rounded-card border border-border shadow-card p-4">
-        <p class="text-xs text-ink-muted">הכנסה</p>
+        <p class="text-xs text-ink-muted">{{ __('income') }}</p>
         <p class="text-2xl font-bold text-ink mt-1">₪{{ number_format($totalRevenue, 0) }}</p>
     </div>
     <a href="{{ route('admin.messages.index') }}" class="bg-white rounded-card border border-border shadow-card p-4 hover:shadow-md transition">
-        <p class="text-xs text-ink-muted">הודעות</p>
+        <p class="text-xs text-ink-muted">{{ __('messages') }}</p>
         <p class="text-2xl font-bold {{ $unreadMessages > 0 ? 'text-danger' : 'text-ink' }} mt-1">{{ $unreadMessages }}</p>
-        <p class="text-xs text-ink-muted mt-1">לא נקראו</p>
+        <p class="text-xs text-ink-muted mt-1">{{ __('unread_messages') }}</p>
     </a>
     <a href="{{ route('admin.projects.create') }}" class="bg-accent/10 rounded-card border border-accent/20 p-4 hover:bg-accent/15 transition flex flex-col items-center justify-center">
         <i data-lucide="plus" class="w-8 h-8 text-accent"></i>
-        <p class="text-xs text-accent mt-1 font-medium">פרויקט חדש</p>
+        <p class="text-xs text-accent mt-1 font-medium">{{ __('new_project') }}</p>
     </a>
 </div>
 
 {{-- Kanban Board --}}
 <div class="mb-6">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold text-ink text-lg">סטטוס פרויקטים — גרור לשינוי</h3>
+        <h3 class="font-semibold text-ink text-lg">{{ __('project_status_kanban') }}</h3>
         <div class="flex items-center gap-2">
             <button onclick="clearAllProjects()" class="text-ink-secondary hover:bg-gray-50 rounded-btn px-4 py-2 text-sm transition inline-flex items-center gap-1.5">
                 <i data-lucide="x" class="w-4 h-4"></i>
-                נקה הכל
+                {{ __('clear_all') }}
             </button>
-            <a href="{{ route('admin.projects.index') }}" class="text-sm text-accent hover:text-accent-dark transition">הכל ←</a>
+            <a href="{{ route('admin.projects.index') }}" class="text-sm text-accent hover:text-accent-dark transition">{{ __('all') }} ←</a>
         </div>
     </div>
 
     @php
         $columns = [
-            'pending' => ['label' => 'ממתין', 'color' => 'yellow', 'bg' => 'bg-yellow-50', 'border' => 'border-yellow-200', 'text' => 'text-yellow-700', 'dot' => 'bg-yellow-500'],
-            'in_progress' => ['label' => 'בתהליך', 'color' => 'blue', 'bg' => 'bg-blue-50', 'border' => 'border-blue-200', 'text' => 'text-blue-700', 'dot' => 'bg-blue-500'],
-            'review' => ['label' => 'בבדיקה', 'color' => 'purple', 'bg' => 'bg-purple-50', 'border' => 'border-purple-200', 'text' => 'text-purple-700', 'dot' => 'bg-purple-500'],
-            'completed' => ['label' => 'הושלם', 'color' => 'green', 'bg' => 'bg-green-50', 'border' => 'border-green-200', 'text' => 'text-green-700', 'dot' => 'bg-green-500'],
+            'pending' => ['label' => __('pending'), 'color' => 'yellow', 'bg' => 'bg-yellow-50', 'border' => 'border-yellow-200', 'text' => 'text-yellow-700', 'dot' => 'bg-yellow-500'],
+            'in_progress' => ['label' => __('in_progress'), 'color' => 'blue', 'bg' => 'bg-blue-50', 'border' => 'border-blue-200', 'text' => 'text-blue-700', 'dot' => 'bg-blue-500'],
+            'review' => ['label' => __('review'), 'color' => 'purple', 'bg' => 'bg-purple-50', 'border' => 'border-purple-200', 'text' => 'text-purple-700', 'dot' => 'bg-purple-500'],
+            'completed' => ['label' => __('completed'), 'color' => 'emerald', 'bg' => 'bg-emerald-50', 'border' => 'border-emerald-200', 'text' => 'text-emerald-700', 'dot' => 'bg-emerald-500'],
         ];
     @endphp
 
@@ -94,7 +94,7 @@
                              ondragstart="handleDragStart(event)">
                             <div class="flex items-center justify-between mb-3">
                                 <a href="{{ route('admin.projects.show', $project) }}" class="font-medium text-sm text-ink hover:text-accent truncate flex-1">{{ $project->title }}</a>
-                                <button onclick="removeProject({{ $project->id }})" class="text-ink-muted hover:text-danger flex-shrink-0 ml-1 transition" title="הסר מהלוח">
+                                <button onclick="removeProject({{ $project->id }})" class="text-ink-muted hover:text-danger flex-shrink-0 ml-1 transition" title="{{ __('remove_from_board') }}">
                                     <i data-lucide="x" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -107,7 +107,7 @@
                             </div>
                             @if($project->due_date)
                                 <p class="text-xs {{ $project->due_date->isPast() ? 'text-danger font-medium' : 'text-ink-muted' }} mt-2">
-                                    {{ $project->due_date->format('d/m/Y') }}{{ $project->due_date->isPast() ? ' — באיחור' : '' }}
+                                    {{ $project->due_date->format('d/m/Y') }}{{ $project->due_date->isPast() ? ' — ' . __('overdue') : '' }}
                                 </p>
                             @endif
                         </div>
@@ -126,7 +126,7 @@
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink flex items-center gap-2">
                     <span class="w-2 h-2 bg-danger rounded-full"></span>
-                    משימות דחופות
+                    {{ __('urgent_tasks') }}
                 </h3>
             </div>
             <div class="divide-y divide-border">
@@ -143,14 +143,14 @@
                                     'in_progress' => 'bg-blue-100 text-blue-800',
                                 ];
                             @endphp
-                            <span class="rounded-badge px-3 py-1 text-xs font-medium {{ $taskStatusColors[$task->status] ?? '' }}">
+                            <span class="rounded-badge px-3 py-1 text-xs font-medium {{ $taskStatusColors[$task->status->value] ?? '' }}">
                                 {{ $task->status_label }}
                             </span>
                         </div>
                     </a>
                 @empty
                     <div class="px-6 py-8 text-center text-ink-muted text-sm">
-                        אין משימות דחופות כרגע
+                        {{ __('no_urgent_tasks') }}
                     </div>
                 @endforelse
             </div>
@@ -161,7 +161,7 @@
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
                 <h3 class="font-semibold text-ink flex items-center gap-2">
                     <i data-lucide="clock" class="w-5 h-5 text-orange-500"></i>
-                    תאריכי יעד קרובים
+                    {{ __('upcoming_deadlines') }}
                 </h3>
             </div>
             <div class="divide-y divide-border">
@@ -174,11 +174,11 @@
                             </div>
                             <div class="text-left">
                                 @php
-                                    $daysLeft = now()->diffInDays($task->due_date, false);
+                                    $daysLeft = round(now()->diffInDays($task->due_date, false));
                                     $isOverdue = $daysLeft < 0;
                                 @endphp
                                 <span class="text-xs font-medium {{ $isOverdue ? 'text-danger' : ($daysLeft <= 2 ? 'text-orange-600' : 'text-ink-secondary') }}">
-                                    {{ $isOverdue ? 'באיחור ' . abs($daysLeft) . ' ימים' : 'בעוד ' . $daysLeft . ' ימים' }}
+                                    {{ $isOverdue ? __('overdue') . ' ' . abs($daysLeft) . ' ' . __('days') : __('in_days') . ' ' . $daysLeft . ' ' . __('days') }}
                                 </span>
                                 <p class="text-xs text-ink-muted mt-0.5">{{ $task->due_date->format('d/m') }}</p>
                             </div>
@@ -186,7 +186,7 @@
                     </a>
                 @empty
                     <div class="px-6 py-8 text-center text-ink-muted text-sm">
-                        אין תאריכי יעד קרובים
+                        {{ __('no_upcoming_deadlines') }}
                     </div>
                 @endforelse
             </div>
@@ -198,8 +198,8 @@
         {{-- Unread Messages --}}
         <div class="bg-white rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-                <h3 class="font-semibold text-ink">הודעות אחרונות</h3>
-                <a href="{{ route('admin.messages.index') }}" class="text-sm text-accent hover:text-accent-dark transition">הכל ←</a>
+                <h3 class="font-semibold text-ink">{{ __('recent_messages') }}</h3>
+                <a href="{{ route('admin.messages.index') }}" class="text-sm text-accent hover:text-accent-dark transition">{{ __('all') }} ←</a>
             </div>
             <div class="divide-y divide-border">
                 @forelse($recentMessages as $message)
@@ -218,7 +218,7 @@
                     </a>
                 @empty
                     <div class="px-6 py-8 text-center text-ink-muted text-sm">
-                        אין הודעות חדשות
+                        {{ __('no_new_messages') }}
                     </div>
                 @endforelse
             </div>
@@ -227,8 +227,8 @@
         {{-- Recent Clients --}}
         <div class="bg-white rounded-card border border-border shadow-card">
             <div class="flex items-center justify-between px-6 py-4 border-b border-border">
-                <h3 class="font-semibold text-ink">לקוחות אחרונים</h3>
-                <a href="{{ route('admin.clients.index') }}" class="text-sm text-accent hover:text-accent-dark transition">הכל ←</a>
+                <h3 class="font-semibold text-ink">{{ __('recent_clients') }}</h3>
+                <a href="{{ route('admin.clients.index') }}" class="text-sm text-accent hover:text-accent-dark transition">{{ __('all') }} ←</a>
             </div>
             <div class="divide-y divide-border">
                 @forelse($recentClients as $client)
@@ -238,11 +238,11 @@
                             <p class="text-sm font-medium text-ink">{{ $client->name }}</p>
                             <p class="text-xs text-ink-muted">{{ $client->email }}</p>
                         </div>
-                        <span class="text-xs text-ink-muted">{{ $client->projects_count }} פרויקטים</span>
+                        <span class="text-xs text-ink-muted">{{ $client->projects_count }} {{ __('projects_count') }}</span>
                     </a>
                 @empty
                     <div class="px-6 py-8 text-center text-ink-muted text-sm">
-                        אין לקוחות עדיין
+                        {{ __('no_clients_yet') }}
                     </div>
                 @endforelse
             </div>
@@ -281,6 +281,8 @@
     }
 
     function updateProjectStatus(projectId, status) {
+        const card = document.querySelector('[data-project-id="' + projectId + '"]');
+        if (card) card.style.opacity = '0.5';
         const token = document.querySelector('meta[name="csrf-token"]').content;
         fetch('/admin/api/projects/' + projectId + '/status', {
             method: 'PUT',
@@ -294,11 +296,12 @@
         .then(r => r.json())
         .then(data => {
             if (data.success) location.reload();
-        });
+        })
+        .catch(() => { if (card) card.style.opacity = '1'; });
     }
 
     function removeProject(projectId) {
-        if (!confirm('להסיר פרויקט זה מהלוח?')) return;
+        if (!confirm('{{ __("confirm_remove_project") }}')) return;
         const token = document.querySelector('meta[name="csrf-token"]').content;
         fetch('/admin/api/dashboard/projects/' + projectId + '/remove', {
             method: 'PUT',
@@ -311,11 +314,12 @@
     }
 
     function clearAllProjects() {
-        if (!confirm('להסיר את כל הפרויקטים מהלוח?')) return;
+        if (!confirm('{{ __("confirm_clear_all") }}')) return;
         const token = document.querySelector('meta[name="csrf-token"]').content;
         fetch('/admin/api/dashboard/clear-all', {
             method: 'PUT',
-            headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+            headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirm: 'cancel-all' }),
         })
         .then(r => r.json())
         .then(data => {

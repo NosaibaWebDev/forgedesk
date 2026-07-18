@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class FileController extends Controller
@@ -27,7 +28,7 @@ class FileController extends Controller
             $path = $file->storeAs(
                 'project-files/' . $project->id,
                 $storedName,
-                'public'
+                'local'
             );
 
             $record = new ProjectFile();
@@ -44,7 +45,7 @@ class FileController extends Controller
         }
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', $count . ' קבצים הועלו בהצלחה.');
+            ->with('success', $count . ' ' . __('files_uploaded'));
     }
 
     public function destroy(Project $project, ProjectFile $file)
@@ -52,11 +53,11 @@ class FileController extends Controller
         $this->authorize('manageFiles', $project);
         abort_unless($file->project_id === $project->id, 404);
 
-        \Storage::disk('public')->delete($file->path);
+        Storage::disk('local')->delete($file->path);
         $file->delete();
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'הקובץ נמחק בהצלחה.');
+            ->with('success', __('file_deleted'));
     }
 
     public function download(Project $project, ProjectFile $file)
@@ -64,10 +65,10 @@ class FileController extends Controller
         $this->authorize('view', $project);
         abort_unless($file->project_id === $project->id, 404);
 
-        if (! \Storage::disk('public')->exists($file->path)) {
+        if (!Storage::disk('local')->exists($file->path)) {
             abort(404);
         }
 
-        return \Storage::disk('public')->download($file->path, $file->original_name);
+        return Storage::disk('local')->download($file->path, $file->original_name);
     }
 }

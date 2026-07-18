@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\User;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -14,6 +16,7 @@ class ProjectController extends Controller
     {
         $projects = Project::with('user')
             ->managedByAdmin(auth()->id())
+            ->withTaskCounts()
             ->latest()
             ->paginate(15);
         return view('admin.projects.index', compact('projects'));
@@ -29,31 +32,11 @@ class ProjectController extends Controller
         return view('admin.projects.create', compact('clients'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'user_id' => [
-                'required',
-                'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    $client = User::where('id', $value)->where('role', 'client')->first();
-                    if (! $client || $client->admin_id !== auth()->id()) {
-                        $fail('הלקוח שנבחר אינו זמין.');
-                    }
-                },
-            ],
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:pending,in_progress,review,completed,cancelled',
-            'priority' => 'required|in:low,medium,high,urgent',
-            'budget' => 'nullable|numeric|min:0',
-            'start_date' => 'nullable|date',
-            'due_date' => 'nullable|date|after_or_equal:start_date',
-            'notes' => 'nullable|string',
-        ]);
-
+        $validated = $request->validated();
         $project = Project::create($validated);
-        return redirect()->route('admin.projects.show', $project)->with('success', 'הפרויקט נוצר בהצלחה.');
+        return redirect()->route('admin.projects.show', $project)->with('success', __('project_created'));
     }
 
     public function show(Project $project)
@@ -74,37 +57,25 @@ class ProjectController extends Controller
         return view('admin.projects.edit', compact('project', 'clients'));
     }
 
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
         $this->authorize('update', $project);
 
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:pending,in_progress,review,completed,cancelled',
-            'priority' => 'required|in:low,medium,high,urgent',
-            'budget' => 'nullable|numeric|min:0',
-            'paid_amount' => 'nullable|numeric|min:0',
-            'start_date' => 'nullable|date',
-            'due_date' => 'nullable|date|after_or_equal:start_date',
-            'completed_at' => 'nullable|date',
-            'notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         if ($validated['status'] === 'completed' && !$project->completed_at) {
             $validated['completed_at'] = now();
         }
 
         $project->update($validated);
-        return redirect()->route('admin.projects.show', $project)->with('success', 'הפרויקט עודכן בהצלחה.');
+        return redirect()->route('admin.projects.show', $project)->with('success', __('project_updated'));
     }
 
     public function destroy(Project $project)
     {
         $this->authorize('delete', $project);
         $project->delete();
-        return redirect()->route('admin.projects.index')->with('success', 'הפרויקט נמחק בהצלחה.');
+        return redirect()->route('admin.projects.index')->with('success', __('project_deleted'));
     }
 
     public function updateStatus(Request $request, Project $project)
@@ -144,7 +115,7 @@ class ProjectController extends Controller
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            fputcsv($file, ['שם פרויקט', 'לקוח', 'סטטוס', 'עדיפות', 'תקציב', 'שולם', 'תאריך התחלה', 'תאריך יעד', 'התקדמות']);
+            fputcsv($file, [__('csv_project_name'), __('csv_client'), __('csv_status'), __('csv_priority'), __('csv_budget'), __('csv_hourly_rate'), __('csv_estimated_hours'), __('csv_estimated_total'), __('csv_paid'), __('csv_start'), __('csv_due'), __('csv_progress')]);
 
             foreach ($projects as $project) {
                 fputcsv($file, [
@@ -153,6 +124,9 @@ class ProjectController extends Controller
                     $project->status_label,
                     $project->priority_label,
                     $project->budget ?? 0,
+                    $project->hourly_rate ?? '',
+                    $project->estimated_hours ?? '',
+                    $project->total_price ?? '',
                     $project->paid_amount,
                     $project->start_date?->format('d/m/Y') ?? '',
                     $project->due_date?->format('d/m/Y') ?? '',
@@ -185,7 +159,7 @@ class ProjectController extends Controller
     public function exportProjectCsv(Project $project)
     {
         $this->authorize('export', $project);
-        $project->load(['tasks.assignee', 'files.uploader']);
+        $project->load(['user', 'tasks.assignee', 'files.uploader']);
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -196,13 +170,16 @@ class ProjectController extends Controller
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            fputcsv($file, ['שם פרויקט', 'לקוח', 'סטטוס', 'עדיפות', 'תקציב', 'שולם', 'יתרה', 'התחלה', 'יעד', 'הושלם ב', 'התקדמות']);
+            fputcsv($file, [__('csv_project_name'), __('csv_client'), __('csv_status'), __('csv_priority'), __('csv_budget'), __('csv_hourly_rate'), __('csv_estimated_hours'), __('csv_estimated_total'), __('csv_paid'), __('csv_balance'), __('csv_start'), __('csv_due'), __('csv_completed'), __('csv_progress')]);
             fputcsv($file, [
                 $project->title,
                 $project->user->name,
                 $project->status_label,
                 $project->priority_label,
                 $project->budget ?? 0,
+                $project->hourly_rate ?? '',
+                $project->estimated_hours ?? '',
+                $project->total_price ?? '',
                 $project->paid_amount,
                 ($project->budget ?? 0) - $project->paid_amount,
                 $project->start_date?->format('d/m/Y') ?? '',
@@ -212,8 +189,8 @@ class ProjectController extends Controller
             ]);
 
             fputcsv($file, []);
-            fputcsv($file, ['משימות']);
-            fputcsv($file, ['כותרת', 'סטטוס', 'עדיפות', 'מוקצה ל', 'שעות מוערכות', 'שעות בפועל', ' תאריך יעד']);
+            fputcsv($file, [__('csv_tasks')]);
+            fputcsv($file, [__('csv_task_title'), __('csv_task_status'), __('csv_task_priority'), __('csv_task_assigned'), __('csv_task_estimated'), __('csv_task_actual'), __('csv_task_due')]);
 
             foreach ($project->tasks as $task) {
                 fputcsv($file, [
@@ -228,8 +205,8 @@ class ProjectController extends Controller
             }
 
             fputcsv($file, []);
-            fputcsv($file, ['קבצים']);
-            fputcsv($file, ['שם קובץ', 'גודל', 'הועלה על ידי', 'תאריך']);
+            fputcsv($file, [__('csv_files')]);
+            fputcsv($file, [__('csv_file_name'), __('csv_file_size'), __('csv_file_uploaded'), __('csv_file_date')]);
 
             foreach ($project->files as $fileRecord) {
                 fputcsv($file, [
@@ -256,7 +233,7 @@ class ProjectController extends Controller
             $statusColors = [
                 'pending' => '#f59e0b', 'in_progress' => '#3b82f6', 'review' => '#8b5cf6', 'completed' => '#22c55e',
             ];
-            $color = $statusColors[$t->status] ?? '#6b7280';
+            $color = $statusColors[$t->status->value] ?? '#6b7280';
             $assigneeName = $t->assignee?->name ?? '-';
             $estHours = $t->estimated_hours ?? '-';
             $actHours = $t->actual_hours ?? '-';
@@ -287,7 +264,7 @@ class ProjectController extends Controller
             'pending' => '#f59e0b', 'in_progress' => '#3b82f6', 'review' => '#8b5cf6',
             'completed' => '#22c55e', 'cancelled' => '#ef4444',
         ];
-        $sColor = $statusColors[$project->status] ?? '#6b7280';
+        $sColor = $statusColors[$project->status->value] ?? '#6b7280';
         $startDate = $project->start_date?->format('d/m/Y') ?? '-';
         $dueDate = $project->due_date?->format('d/m/Y') ?? '-';
         $completedDate = $project->completed_at?->format('d/m/Y') ?? '-';
@@ -306,23 +283,26 @@ class ProjectController extends Controller
             @media print{body{padding:20px}}
         </style></head><body>
             <h1>" . e($project->title) . "</h1>
-            <p class='subtitle'>ForgeDesk Studio — דוח פרויקט | תאריך: " . e(now()->format('d/m/Y H:i')) . "</p>
+            <p class='subtitle'>" . __('pdf_report_project') . " | " . __('pdf_date') . " " . e(now()->format('d/m/Y H:i')) . "</p>
             <div class='info-grid'>
-                <div class='info-item'><div class='info-label'>לקוח</div><div class='info-value'>" . e($project->user->name) . "</div></div>
-                <div class='info-item'><div class='info-label'>סטטוס</div><div class='info-value'><span style='color:{$sColor}'>" . e($project->status_label) . "</span></div></div>
-                <div class='info-item'><div class='info-label'>עדיפות</div><div class='info-value'>" . e($project->priority_label) . "</div></div>
-                <div class='info-item'><div class='info-label'>תקציב</div><div class='info-value'>₪" . number_format($project->budget ?? 0) . "</div></div>
-                <div class='info-item'><div class='info-label'>שולם</div><div class='info-value'>₪" . number_format($project->paid_amount) . "</div></div>
-                <div class='info-item'><div class='info-label'>התקדמות</div><div class='info-value'>" . e($project->progress) . "%</div></div>
-                <div class='info-item'><div class='info-label'>התחלה</div><div class='info-value'>" . e($startDate) . "</div></div>
-                <div class='info-item'><div class='info-label'>יעד</div><div class='info-value'>" . e($dueDate) . "</div></div>
-                <div class='info-item'><div class='info-label'>הושלם ב</div><div class='info-value'>" . e($completedDate) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('client') . "</div><div class='info-value'>" . e($project->user->name) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('status') . "</div><div class='info-value'><span style='color:{$sColor}'>" . e($project->status_label) . "</span></div></div>
+                <div class='info-item'><div class='info-label'>" . __('priority') . "</div><div class='info-value'>" . e($project->priority_label) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('budget') . "</div><div class='info-value'>₪" . number_format($project->budget ?? 0) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('hourly_rate') . "</div><div class='info-value'>₪" . number_format($project->hourly_rate ?? 0, 2) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('estimated_hours_label') . "</div><div class='info-value'>" . e($project->estimated_hours ?? '-') . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('estimated_total') . "</div><div class='info-value'>₪" . number_format($project->total_price ?? 0, 2) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('paid_amount') . "</div><div class='info-value'>₪" . number_format($project->paid_amount) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('progress') . "</div><div class='info-value'>" . e($project->progress) . "%</div></div>
+                <div class='info-item'><div class='info-label'>" . __('csv_start') . "</div><div class='info-value'>" . e($startDate) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('pdf_due') . "</div><div class='info-value'>" . e($dueDate) . "</div></div>
+                <div class='info-item'><div class='info-label'>" . __('csv_completed') . "</div><div class='info-value'>" . e($completedDate) . "</div></div>
             </div>
-            " . ($project->description ? "<p><strong>תיאור:</strong> " . e($project->description) . "</p>" : '') . "
-            <h2>משימות (" . $project->tasks->count() . ")</h2>
-            <table><thead><tr><th>משימה</th><th>סטטוס</th><th>עדיפות</th><th>מוקצה ל</th><th>שעות מוערכות</th><th>שעות בפועל</th><th>יעד</th></tr></thead><tbody>{$taskRows}</tbody></table>
-            <h2>קבצים (" . $project->files->count() . ")</h2>
-            <table><thead><tr><th>קובץ</th><th>גודל</th><th>הועלה על ידי</th><th>תאריך</th></tr></thead><tbody>{$fileRows}</tbody></table>
+            " . ($project->description ? "<p><strong>" . __('description') . ":</strong> " . e($project->description) . "</p>" : '') . "
+            <h2>" . __('tasks') . " (" . $project->tasks->count() . ")</h2>
+            <table><thead><tr><th>" . __('pdf_task') . "</th><th>" . __('status') . "</th><th>" . __('priority') . "</th><th>" . __('assigned_to') . "</th><th>" . __('estimated_hours_label') . "</th><th>" . __('actual_hours') . "</th><th>" . __('pdf_due') . "</th></tr></thead><tbody>{$taskRows}</tbody></table>
+            <h2>" . __('files') . " (" . $project->files->count() . ")</h2>
+            <table><thead><tr><th>" . __('pdf_file') . "</th><th>" . __('file_size') . "</th><th>" . __('uploaded_by') . "</th><th>" . __('date') . "</th></tr></thead><tbody>{$fileRows}</tbody></table>
             <script>window.onload=function(){window.print()}</script>
         </body></html>";
 
@@ -342,13 +322,16 @@ class ProjectController extends Controller
                 'pending' => '#f59e0b', 'in_progress' => '#3b82f6', 'review' => '#8b5cf6',
                 'completed' => '#22c55e', 'cancelled' => '#ef4444',
             ];
-            $color = $statusColors[$p->status] ?? '#6b7280';
+            $color = $statusColors[$p->status->value] ?? '#6b7280';
             $rows .= "<tr>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($p->title) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($p->user->name) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'><span style='color:{$color};font-weight:600'>" . e($p->status_label) . "</span></td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($p->priority_label) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb;text-align:left'>₪" . number_format($p->budget ?? 0) . "</td>
+                <td style='padding:8px;border-bottom:1px solid #e5e7eb;text-align:left'>" . ($p->hourly_rate !== null ? '₪' . number_format($p->hourly_rate, 2) : '-') . "</td>
+                <td style='padding:8px;border-bottom:1px solid #e5e7eb;text-align:center'>" . e($p->estimated_hours ?? '-') . "</td>
+                <td style='padding:8px;border-bottom:1px solid #e5e7eb;text-align:left'>" . ($p->total_price !== null ? '₪' . number_format($p->total_price, 2) : '-') . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb;text-align:left'>₪" . number_format($p->paid_amount) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($p->start_date?->format('d/m/Y')) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($p->due_date?->format('d/m/Y')) . "</td>
@@ -364,12 +347,12 @@ class ProjectController extends Controller
             th{background:#f3f4f6;padding:10px 8px;text-align:right;font-size:13px;color:#374151;border-bottom:2px solid #d1d5db}
             @media print{body{padding:20px}}
         </style></head><body>
-            <h1>ForgeDesk Studio — דוח פרויקטים</h1>
-            <p class='subtitle'>תאריך: " . now()->format('d/m/Y H:i') . " | סה\"כ: " . $projects->count() . " פרוикטים</p>
+            <h1>" . __('pdf_report_projects') . "</h1>
+            <p class='subtitle'>" . __('pdf_date') . " " . now()->format('d/m/Y H:i') . " | " . __('pdf_total') . " " . $projects->count() . " " . __('projects') . "</p>
             <table>
                 <thead><tr>
-                    <th>פרויקט</th><th>לקוח</th><th>סטטוס</th><th>עדיפות</th>
-                    <th>תקציב</th><th>שולם</th><th>התחלה</th><th>יעד</th><th>התקדמות</th>
+                    <th>" . __('csv_project') . "</th><th>" . __('client') . "</th><th>" . __('status') . "</th><th>" . __('priority') . "</th>
+                    <th>" . __('budget') . "</th><th>" . __('hourly_rate') . "</th><th>" . __('estimated_hours_label') . "</th><th>" . __('estimated_total') . "</th><th>" . __('paid_amount') . "</th><th>" . __('csv_start') . "</th><th>" . __('pdf_due') . "</th><th>" . __('progress') . "</th>
                 </tr></thead>
                 <tbody>{$rows}</tbody>
             </table>

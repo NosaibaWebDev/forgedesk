@@ -13,7 +13,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::forClient(auth()->id())->with('tasks')->latest()->paginate(15);
+        $projects = Project::forClient(auth()->id())->withTaskCounts()->latest()->paginate(15);
         return view('client.projects.index', compact('projects'));
     }
 
@@ -44,7 +44,7 @@ class ProjectController extends Controller
         ]);
 
         foreach ($request->file('images') as $file) {
-            $path = $file->store('task-images/' . $project->id, 'public');
+            $path = $file->store('task-images/' . $project->id, 'local');
             $task->images()->create([
                 'uploaded_by' => auth()->id(),
                 'original_name' => $file->getClientOriginalName(),
@@ -55,20 +55,22 @@ class ProjectController extends Controller
         }
 
         return redirect()->route('client.projects.show', $project)
-            ->with('success', 'תמונות המשימה הועלו בהצלחה.');
+            ->with('success', __('task_images_uploaded'));
     }
 
     public function destroyTaskImage(Request $request, Project $project, $task, TaskImage $image)
     {
         abort_unless($project->user_id === auth()->id(), 404);
+        $task = $project->tasks()->findOrFail($task);
+        abort_unless($image->task_id === $task->id, 404);
 
-        if ($image->file_path && Storage::disk('public')->exists($image->file_path)) {
-            Storage::disk('public')->delete($image->file_path);
+        if ($image->file_path && Storage::disk('local')->exists($image->file_path)) {
+            Storage::disk('local')->delete($image->file_path);
         }
         $image->delete();
 
         return redirect()->route('client.projects.show', $project)
-            ->with('success', 'תמונת המשימה נמחקה בהצלחה.');
+            ->with('success', __('task_image_deleted'));
     }
 
     public function exportCsv()
@@ -83,7 +85,7 @@ class ProjectController extends Controller
         $callback = function () use ($projects) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($file, ['פרויקט', 'סטטוס', 'עדיפות', 'תקציב', 'שולם', 'יתרה', 'התחלה', 'יעד', 'משימות', 'התקדמות']);
+            fputcsv($file, [__('csv_project'), __('csv_status'), __('csv_priority'), __('csv_budget'), __('csv_hourly_rate'), __('csv_estimated_hours'), __('csv_estimated_total'), __('csv_paid'), __('csv_balance'), __('csv_start'), __('csv_due'), __('csv_tasks'), __('csv_progress')]);
 
             foreach ($projects as $p) {
                 fputcsv($file, [
@@ -91,6 +93,9 @@ class ProjectController extends Controller
                     $p->status_label,
                     $p->priority_label,
                     $p->budget ?? 0,
+                    $p->hourly_rate ?? '',
+                    $p->estimated_hours ?? '',
+                    $p->total_price ?? '',
                     $p->paid_amount,
                     ($p->budget ?? 0) - $p->paid_amount,
                     $p->start_date?->format('d/m/Y') ?? '',
@@ -120,12 +125,15 @@ class ProjectController extends Controller
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            fputcsv($file, ['שם פרויקט', 'סטטוס', 'עדיפות', 'תקציב', 'שולם', 'יתרה', 'התחלה', 'יעד', 'התקדמות']);
+            fputcsv($file, [__('csv_project_name'), __('csv_status'), __('csv_priority'), __('csv_budget'), __('csv_hourly_rate'), __('csv_estimated_hours'), __('csv_estimated_total'), __('csv_paid'), __('csv_balance'), __('csv_start'), __('csv_due'), __('csv_progress')]);
             fputcsv($file, [
                 $project->title,
                 $project->status_label,
                 $project->priority_label,
                 $project->budget ?? 0,
+                $project->hourly_rate ?? '',
+                $project->estimated_hours ?? '',
+                $project->total_price ?? '',
                 $project->paid_amount,
                 ($project->budget ?? 0) - $project->paid_amount,
                 $project->start_date?->format('d/m/Y') ?? '',
@@ -134,8 +142,8 @@ class ProjectController extends Controller
             ]);
 
             fputcsv($file, []);
-            fputcsv($file, ['משימות']);
-            fputcsv($file, ['כותרת', 'סטטוס', 'עדיפות', 'מוקצה ל', 'שעות מוערכות', 'תאריך יעד']);
+            fputcsv($file, [__('csv_tasks')]);
+            fputcsv($file, [__('csv_task_title'), __('csv_task_status'), __('csv_task_priority'), __('csv_task_assigned'), __('csv_task_estimated'), __('csv_task_due')]);
 
             foreach ($project->tasks as $task) {
                 fputcsv($file, [
@@ -149,8 +157,8 @@ class ProjectController extends Controller
             }
 
             fputcsv($file, []);
-            fputcsv($file, ['קבצים']);
-            fputcsv($file, ['שם קובץ', 'גודל', 'תאריך']);
+            fputcsv($file, [__('csv_files')]);
+            fputcsv($file, [__('csv_file_name'), __('csv_file_size'), __('csv_file_date')]);
 
             foreach ($project->files as $fileRecord) {
                 fputcsv($file, [

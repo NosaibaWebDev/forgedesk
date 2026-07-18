@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'שיחה - ' . $client->name . ' - מנהל')
+@section('title', __('conversation_with_admin') . ' - ' . $client->name)
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <a href="{{ route('admin.messages.index') }}" class="text-ink-muted hover:text-accent transition">הודעות</a>
+    <a href="{{ route('admin.messages.index') }}" class="text-ink-muted hover:text-accent transition">{{ __('messages') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
     <span class="text-ink font-medium">{{ $client->name }}</span>
 </nav>
@@ -24,21 +24,21 @@
                     <p class="text-xs text-ink-muted">{{ $project->title }}</p>
                 </div>
                 <div class="mr-auto flex items-center gap-2">
-                    <a href="{{ route('admin.messages.index') }}" class="text-xs text-ink-muted hover:text-ink transition">← חזרה לשיחות</a>
+                    <a href="{{ route('admin.messages.index') }}" class="text-xs text-ink-muted hover:text-ink transition">← {{ __('back_to_conversations') }}</a>
                 </div>
             </div>
         </div>
 
         <div class="p-6 max-h-[500px] overflow-y-auto space-y-4 bg-surface" id="messages-container">
             @forelse($messages as $message)
-                <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-start' : 'justify-end' }}">
+                <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                     <div class="max-w-md px-5 py-3.5 rounded-2xl {{ $message->sender_id === auth()->id() ? 'bg-accent/10 text-ink border border-accent/20' : 'bg-white text-ink border border-border shadow-sm' }}">
                         <p class="text-xs text-ink-muted mb-1">{{ $message->sender->name }} · {{ $message->created_at->format('d/m/Y H:i') }}</p>
                         <p class="text-sm leading-relaxed">{{ $message->body }}</p>
                     </div>
                 </div>
             @empty
-                <p class="text-center text-ink-muted py-8">אין הודעות עדיין. שלח הודעה ראשונה!</p>
+                <p class="text-center text-ink-muted py-8">{{ __('no_messages_send_first') }}</p>
             @endforelse
         </div>
 
@@ -46,10 +46,10 @@
             <form method="POST" action="{{ route('admin.messages.store', $project) }}">
                 @csrf
                 <div class="flex gap-3">
-                    <input type="text" name="body" required placeholder="הקלד הודעה..."
+                    <input type="text" name="body" required placeholder="{{ __('type_message') }}"
                         class="input flex-1">
                     <button type="submit" class="btn-primary">
-                        שלח
+                        {{ __('send') }}
                     </button>
                 </div>
                 @error('body') <p class="text-danger text-sm mt-1">{{ $message }}</p> @enderror

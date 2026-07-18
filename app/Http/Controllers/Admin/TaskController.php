@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\TaskImage;
@@ -12,46 +14,24 @@ use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
-    public function store(Request $request, Project $project)
+    public function store(StoreTaskRequest $request, Project $project)
     {
         $this->authorize('manageTasks', $project);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'assigned_to' => 'nullable|exists:users,id',
-            'status' => 'required|in:pending,in_progress,review,completed',
-            'priority' => 'required|in:low,medium,high,urgent',
-            'estimated_hours' => 'nullable|numeric|min:0',
-            'due_date' => 'nullable|date',
-        ]);
-
+        $validated = $request->validated();
         $project->tasks()->create($validated);
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'המשימה נוספה בהצלחה.');
+            ->with('success', __('task_created'));
     }
 
-    public function update(Request $request, Project $project, Task $task)
+    public function update(UpdateTaskRequest $request, Project $project, Task $task)
     {
         $this->authorize('manageTasks', $project);
         abort_unless($task->project_id === $project->id, 404);
-
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'assigned_to' => 'nullable|exists:users,id',
-            'status' => 'required|in:pending,in_progress,review,completed',
-            'priority' => 'required|in:low,medium,high,urgent',
-            'estimated_hours' => 'nullable|numeric|min:0',
-            'actual_hours' => 'nullable|numeric|min:0',
-            'due_date' => 'nullable|date',
-        ]);
-
-        $task->update($validated);
+        $task->update($request->validated());
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'המשימה עודכנה בהצלחה.');
+            ->with('success', __('task_updated'));
     }
 
     public function destroy(Project $project, Task $task)
@@ -62,7 +42,7 @@ class TaskController extends Controller
         $task->delete();
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'המשימה נמחקה בהצלחה.');
+            ->with('success', __('task_deleted'));
     }
 
     public function toggleStatus(Project $project, Task $task)
@@ -70,12 +50,25 @@ class TaskController extends Controller
         $this->authorize('manageTasks', $project);
         abort_unless($task->project_id === $project->id, 404);
 
-        $cycle = ['pending' => 'in_progress', 'in_progress' => 'review', 'review' => 'completed', 'completed' => 'pending'];
-        $task->status = $cycle[$task->status] ?? 'pending';
-        $task->save();
+        $task->cycleStatus();
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'סטטוס המשימה עודכן.');
+            ->with('success', __('task_status_updated'));
+    }
+
+    public function updateStatus(Request $request, Project $project, Task $task)
+    {
+        $this->authorize('manageTasks', $project);
+        abort_unless($task->project_id === $project->id, 404);
+
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,review,completed',
+        ]);
+
+        $task->update(['status' => $request->status]);
+
+        return redirect()->route('admin.projects.show', $project)
+            ->with('success', __('task_status_updated'));
     }
 
     public function uploadImage(Request $request, Project $project, Task $task)
@@ -89,7 +82,7 @@ class TaskController extends Controller
         ]);
 
         foreach ($request->file('images') as $file) {
-            $path = $file->store('task-images/' . $project->id, 'public');
+            $path = $file->store('task-images/' . $project->id, 'local');
             $task->images()->create([
                 'uploaded_by' => auth()->id(),
                 'original_name' => $file->getClientOriginalName(),
@@ -100,7 +93,7 @@ class TaskController extends Controller
         }
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'תמונות המשימה הועלו בהצלחה.');
+            ->with('success', __('task_images_uploaded'));
     }
 
     public function destroyImage(Project $project, Task $task, TaskImage $image)
@@ -109,12 +102,12 @@ class TaskController extends Controller
         abort_unless($task->project_id === $project->id, 404);
         abort_unless($image->task_id === $task->id, 404);
 
-        if ($image->file_path && Storage::disk('public')->exists($image->file_path)) {
-            Storage::disk('public')->delete($image->file_path);
+        if ($image->file_path && Storage::disk('local')->exists($image->file_path)) {
+            Storage::disk('local')->delete($image->file_path);
         }
         $image->delete();
 
         return redirect()->route('admin.projects.show', $project)
-            ->with('success', 'תמונת המשימה נמחקה בהצלחה.');
+            ->with('success', __('task_image_deleted'));
     }
 }

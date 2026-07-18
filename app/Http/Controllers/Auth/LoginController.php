@@ -40,7 +40,7 @@ class LoginController extends Controller
                 $request->session()->regenerateToken();
 
                 return redirect()->route('login')
-                    ->with('error', 'החשבון שלך מושבת. פנה למנהל המערכת.');
+                    ->with('error', __('account_disabled'));
             }
 
             return $user->isAdmin()
@@ -50,7 +50,7 @@ class LoginController extends Controller
 
         return redirect()->route('login')
             ->withInput($request->only('email', 'remember'))
-            ->withErrors(['email' => 'דוא"ל או סיסמה שגויים.']);
+            ->withErrors(['email' => __('login_error')]);
     }
 
     public function logout(Request $request)

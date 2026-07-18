@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class ProjectFile extends Model
 {
@@ -40,7 +40,11 @@ class ProjectFile extends Model
 
     public function getTemporaryUrl(): ?string
     {
-        return Storage::disk('public')->url($this->path);
+        return URL::temporarySignedRoute(
+            'file.preview.project-file',
+            now()->addHours(2),
+            ['file' => $this->id]
+        );
     }
 
     public function getFormattedSizeAttribute(): string

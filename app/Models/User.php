@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -19,13 +20,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-        'admin_id',
         'phone',
         'company',
         'avatar',
         'address',
-        'is_active',
+        'preferred_language',
     ];
 
     protected $hidden = [
@@ -99,11 +98,38 @@ class User extends Authenticatable
 
     public function unreadMessagesCount(): int
     {
-        return $this->receivedMessages()->where('is_read', false)->count();
+        return Cache::remember("user_{$this->id}_unread_messages", 60, function () {
+            return $this->receivedMessages()->where('is_read', false)->count();
+        });
     }
 
     public function scopeManagedByAdmin($query, int $adminId)
     {
         return $query->where('admin_id', $adminId);
+    }
+
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
+    public function taskImages(): HasMany
+    {
+        return $this->hasMany(TaskImage::class, 'uploaded_by');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    public function scopeClients($query)
+    {
+        return $query->where('role', 'client');
     }
 }

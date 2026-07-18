@@ -10,8 +10,15 @@ class AdminOnly
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            abort(403, 'גישה זו מוגבלת למנהלים בלבד.');
+        if (!$request->user()->isAdmin()) {
+            return redirect()->route('login')->with('error', 'אין לך גישה לאזור זה.');
+        }
+
+        if (!$request->user()->is_active) {
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->with('error', 'החשבון שלך הושבת. אנא פנה למנהל.');
         }
 
         return $next($request);

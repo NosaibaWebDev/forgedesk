@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class TaskImage extends Model
 {
@@ -33,7 +33,11 @@ class TaskImage extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->file_path);
+        return URL::temporarySignedRoute(
+            'file.download.task-image',
+            now()->addHours(2),
+            ['image' => $this->id]
+        );
     }
 
     public function getIsImageAttribute(): bool

@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'הפרויקטים שלי')
+@section('title', __('my_projects'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('client.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('client.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">הפרויקטים שלי</span>
+    <span class="text-ink font-medium">{{ __('my_projects') }}</span>
 </nav>
 @endsection
 
@@ -13,11 +13,11 @@
 <div x-data="{ open: false }" class="relative">
     <button @click="open = !open" @click.outside="open = false" class="btn-ghost inline-flex items-center gap-2">
         <i data-lucide="download" class="w-4 h-4"></i>
-        ייצוא
+        {{ __('export') }}
         <i data-lucide="chevron-down" class="w-3 h-3"></i>
     </button>
     <div x-show="open" x-transition x-cloak class="absolute left-0 mt-2 w-48 shadow-elevated z-50 py-1 overflow-hidden" style="background:var(--color-card); border:1px solid var(--color-border); border-radius:12px;">
-        <a href="{{ route('client.projects.export.csv') }}" class="dropdown-item"><i data-lucide="file-text"></i>ייצוא CSV</a>
+        <a href="{{ route('client.projects.export.csv') }}" class="dropdown-item"><i data-lucide="file-text"></i>{{ __('export_csv') }}</a>
     </div>
 </div>
 @endsection
@@ -25,7 +25,7 @@
 @section('content')
 <div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
     <div class="px-6 py-5 border-b border-border">
-        <h2 class="text-lg font-semibold text-ink">רשימת פרויקטים</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ __('projects_list') }}</h2>
     </div>
 
     {{-- Desktop table --}}
@@ -33,13 +33,13 @@
         <table class="w-full text-right">
             <thead>
                 <tr>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">שם הפרויקט</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">סטטוס</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">עדיפות</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">התקדמות</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">משימות</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">תאריך יעד</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">פעולות</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('project_name') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('priority') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('progress') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('tasks') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('due_date') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border">
@@ -58,7 +58,7 @@
                                     'cancelled' => 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20',
                                 ];
                             @endphp
-                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status] ?? '' }}">
+                            <span class="rounded-badge px-3 py-1 text-xs font-medium ring-1 ring-inset {{ $statusColors[$project->status->value] ?? '' }}">
                                 {{ $project->status_label }}
                             </span>
                         </td>
@@ -71,7 +71,7 @@
                                     'urgent' => 'text-danger',
                                 ];
                             @endphp
-                            <span class="text-sm font-medium {{ $priorityColors[$project->priority] ?? '' }}">
+                            <span class="text-sm font-medium {{ $priorityColors[$project->priority->value] ?? '' }}">
                                 {{ $project->priority_label }}
                             </span>
                         </td>
@@ -84,7 +84,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-5 text-sm text-ink-secondary">
-                            {{ $project->tasks->count() }} משימות
+                            {{ $project->total_tasks_count ?? 0 }} {{ __('tasks') }}
                         </td>
                         <td class="px-6 py-5 text-sm text-ink-secondary">
                             {{ $project->due_date?->format('d/m/Y') ?? '-' }}
@@ -97,7 +97,7 @@
                     <tr>
                         <td colspan="7" class="px-6 py-16 text-center text-ink-muted">
                             <i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
-                            <p>אין לך פרויקטים עדיין.</p>
+                            <p>{{ __('no_client_projects') }}</p>
                         </td>
                     </tr>
                 @endforelse
@@ -122,7 +122,7 @@
                             'cancelled' => 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20',
                         ];
                     @endphp
-                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status] ?? '' }}">
+                    <span class="rounded-badge px-2.5 py-1 text-xs font-medium ring-1 ring-inset whitespace-nowrap {{ $statusColors[$project->status->value] ?? '' }}">
                         {{ $project->status_label }}
                     </span>
                 </div>
@@ -135,7 +135,7 @@
                             'urgent' => 'text-danger',
                         ];
                     @endphp
-                    <span class="font-medium {{ $priorityColors[$project->priority] ?? '' }}">
+                    <span class="font-medium {{ $priorityColors[$project->priority->value] ?? '' }}">
                         {{ $project->priority_label }}
                     </span>
                     <span class="text-ink-secondary">
@@ -149,14 +149,14 @@
                     <span class="text-xs font-medium text-ink-secondary">{{ $project->progress }}%</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                    <span class="text-ink-secondary">{{ $project->tasks->count() }} משימות</span>
+                    <span class="text-ink-secondary">{{ $project->total_tasks_count ?? 0 }} {{ __('tasks') }}</span>
                     <i data-lucide="chevron-left" class="w-5 h-5 text-ink-muted"></i>
                 </div>
             </a>
         @empty
             <div class="px-6 py-16 text-center text-ink-muted">
                 <i data-lucide="folder-open" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
-                <p>אין לך פרויקטים עדיין.</p>
+                <p>{{ __('no_client_projects') }}</p>
             </div>
         @endforelse
     </div>

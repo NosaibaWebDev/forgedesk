@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-theme="light">
+<html lang="{{ $currentLocale ?? 'he' }}" dir="rtl" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>התחברות - ForgeDesk Studio</title>
+    <title>{{ __('login') }} - {{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}</title>
     <link rel="stylesheet" href="/css/app.css">
     <script>
         (function() {
@@ -41,9 +41,15 @@
                 <div class="w-12 h-12 rounded-card flex items-center justify-center mx-auto mb-4" style="background:var(--color-accent-light);">
                     <i data-lucide="hexagon" class="w-6 h-6 text-accent"></i>
                 </div>
-                <h1 class="text-2xl font-bold" style="color:var(--color-ink);">ForgeDesk Studio</h1>
-                <p class="mt-1.5 text-sm" style="color:var(--color-ink-secondary);">התחברות למערכת</p>
+                <h1 class="text-2xl font-bold" style="color:var(--color-ink);">{{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}</h1>
+                <p class="mt-1.5 text-sm" style="color:var(--color-ink-secondary);">{{ __('login_title') }}</p>
             </div>
+
+            @if(session('success'))
+                <div class="border px-4 py-3 rounded-input mb-6" style="background:rgba(23,195,178,.08); border-color:rgba(23,195,178,.2); color:#12A899;">
+                    <p class="text-sm">{{ session('success') }}</p>
+                </div>
+            @endif
 
             @if($errors->any())
                 <div class="border px-4 py-3 rounded-input mb-6" style="background:rgba(239,68,68,.08); border-color:rgba(239,68,68,.2); color:var(--color-danger);">
@@ -65,7 +71,7 @@
                 @csrf
 
                 <div class="mb-5">
-                    <label for="email" class="label">דוא"ל</label>
+                    <label for="email" class="label">{{ __('email') }}</label>
                     <input
                         type="email"
                         id="email"
@@ -79,14 +85,14 @@
                 </div>
 
                 <div class="mb-6">
-                    <label for="password" class="label">סיסמה</label>
+                    <label for="password" class="label">{{ __('password') }}</label>
                     <input
                         type="password"
                         id="password"
                         name="password"
                         required
                         class="input text-right"
-                        placeholder="הקלידו את הסיסמה"
+                        placeholder="{{ __('enter_password') }}"
                     >
                 </div>
 
@@ -97,34 +103,47 @@
                             name="remember"
                             class="w-4 h-4 text-accent rounded focus:ring-accent/30"
                         >
-                        <span class="mr-2 text-sm" style="color:var(--color-ink-secondary);">זכור אותי</span>
+                        <span class="mr-2 text-sm" style="color:var(--color-ink-secondary);">{{ __('remember_me') }}</span>
                     </label>
+                    <a href="{{ route('password.request') }}" class="text-sm font-medium transition" style="color:var(--color-accent);">
+                        {{ __('forgot_password') }}
+                    </a>
                 </div>
 
                 <button
                     type="submit"
                     class="w-full btn-primary justify-center"
                 >
-                    התחבר
+                    {{ __('login_button') }}
                 </button>
             </form>
 
-            <div class="mt-6 flex justify-center">
+            <div class="mt-6 text-center">
+                <a href="{{ route('register') }}" class="text-sm font-medium transition" style="color:var(--color-accent);">
+                    {{ __('no_account') }}
+                </a>
+            </div>
+
+            <div class="mt-4 flex justify-center gap-4">
                 <button onclick="toggleTheme()" class="flex items-center gap-2 text-sm transition" style="color:var(--color-ink-muted);">
                     <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
                     <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
-                    <span class="dark:hidden">מצב כהה</span>
-                    <span class="hidden dark:block">מצב בהיר</span>
+                    <span class="dark:hidden">{{ __('dark_mode') }}</span>
+                    <span class="hidden dark:block">{{ __('light_mode') }}</span>
                 </button>
+                <a href="{{ route('language.switch', $currentLocale === 'he' ? 'ar' : 'he') }}" class="flex items-center gap-2 text-sm transition" style="color:var(--color-ink-muted);">
+                    <i data-lucide="globe" class="w-4 h-4"></i>
+                    <span>{{ $currentLocale === 'he' ? 'عرب' : 'עב' }}</span>
+                </a>
             </div>
         </div>
 
         <p class="text-center text-sm mt-6" style="color:var(--color-ink-muted);">
-            &copy; {{ date('Y') }} ForgeDesk Studio. כל הזכויות שמורות.
+            &copy; {{ date('Y') }} {{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}. {{ __('copyright') }}
         </p>
     </div>
 
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js" integrity="sha384-ieG+IKD0d/ZPXyCBTMVAbqsQdns8QGJR/e26WMw7M4fkaI/rHcS/YIoi+ah9WGge" crossorigin="anonymous"></script>
     <script>
         function toggleTheme() {
             var html = document.documentElement;

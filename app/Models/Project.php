@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Priority;
+use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,8 @@ class Project extends Model
         'status',
         'priority',
         'budget',
+        'hourly_rate',
+        'estimated_hours',
         'paid_amount',
         'start_date',
         'due_date',
@@ -29,7 +33,11 @@ class Project extends Model
     protected function casts(): array
     {
         return [
+            'status' => ProjectStatus::class,
+            'priority' => Priority::class,
             'budget' => 'decimal:2',
+            'hourly_rate' => 'decimal:2',
+            'estimated_hours' => 'decimal:2',
             'paid_amount' => 'decimal:2',
             'start_date' => 'date',
             'due_date' => 'date',
@@ -57,39 +65,67 @@ class Project extends Model
         return $this->hasMany(ProjectFile::class);
     }
 
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(TimeEntry::class);
+    }
+
     public function getProgressAttribute(): int
     {
-        $total = $this->tasks()->count();
+        if ($this->hasAttribute('total_tasks_count')) {
+            $total = $this->total_tasks_count ?? 0;
+            $completed = $this->completed_tasks_count ?? 0;
+        } else {
+            $total = $this->tasks()->count();
+            $completed = $total > 0
+                ? $this->tasks()->whereIn('status', ['completed', 'review'])->count()
+                : 0;
+        }
+
         if ($total === 0) {
             return 0;
         }
 
-        $completed = $this->tasks()->whereIn('status', ['completed', 'review'])->count();
-
         return (int) round(($completed / $total) * 100);
+    }
+
+    public function getTotalPriceAttribute(): ?float
+    {
+        if ($this->hourly_rate !== null && $this->estimated_hours !== null) {
+            return round($this->hourly_rate * $this->estimated_hours, 2);
+        }
+        return null;
     }
 
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            'pending' => 'ממתין',
-            'in_progress' => 'בתהליך',
-            'review' => 'בבדיקה',
-            'completed' => 'הושלם',
-            'cancelled' => 'בוטל',
-            default => $this->status,
-        };
+        return $this->status->label();
     }
 
     public function getPriorityLabelAttribute(): string
     {
-        return match ($this->priority) {
-            'low' => 'נמוכה',
-            'medium' => 'בינונית',
-            'high' => 'גבוהה',
-            'urgent' => 'דחופה',
-            default => $this->priority,
-        };
+        return $this->priority->label();
+    }
+
+    public function getNextStatusAttribute(): ProjectStatus
+    {
+        return $this->status->next();
+    }
+
+    public function getRemainingBudgetAttribute(): float
+    {
+        return ($this->budget ?? 0) - $this->paid_amount;
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::updating(function (Project $project) {
+            if ($project->isDirty('status') && $project->status === ProjectStatus::Completed && !$project->completed_at) {
+                $project->completed_at = now();
+            }
+        });
     }
 
     public function scopeForClient($query, int $userId)
@@ -107,5 +143,20 @@ class Project extends Model
     public function scopeActive($query)
     {
         return $query->whereNotIn('status', ['completed', 'cancelled']);
+    }
+
+    public function scopeWithTaskCounts($query)
+    {
+        return $query->withCount([
+            'tasks as total_tasks_count',
+            'tasks as completed_tasks_count' => function ($q) {
+                $q->whereIn('status', ['completed', 'review']);
+            },
+        ]);
+    }
+
+    public function scopeOverdue($query)
+    {
+        return $query->where('due_date', '<', now())->where('status', '!=', ProjectStatus::Completed);
     }
 }

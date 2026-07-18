@@ -29,8 +29,10 @@ class DashboardController extends Controller
 
         $activeProjectsList = Project::with('user')
             ->managedByAdmin($userId)
+            ->withTaskCounts()
             ->where('status', '!=', 'cancelled')
             ->latest()
+            ->take(50)
             ->get();
 
         $urgentTasks = Task::with(['project', 'assignee'])
@@ -87,11 +89,16 @@ class DashboardController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function clearAll()
+    public function clearAll(Request $request)
     {
+        $request->validate([
+            'confirm' => 'required|in:cancel-all',
+        ]);
+
         Project::managedByAdmin(auth()->id())
             ->where('status', '!=', 'cancelled')
             ->update(['status' => 'cancelled']);
+
         return response()->json(['success' => true]);
     }
 }

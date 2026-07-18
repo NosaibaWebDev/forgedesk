@@ -22,7 +22,7 @@ class DashboardController extends Controller
             ->count();
 
         $recentProjects = Project::forClient($userId)
-            ->with('tasks')
+            ->withTaskCounts()
             ->latest()
             ->take(5)
             ->get();
@@ -39,8 +39,12 @@ class DashboardController extends Controller
             ->get();
 
         $recentMessages = Message::with(['sender', 'receiver', 'project'])
-            ->where('sender_id', $userId)
-            ->orWhere('receiver_id', $userId)
+            ->whereHas('project', function ($q) use ($userId) {
+                $q->forClient($userId);
+            })
+            ->where(function ($q) use ($userId) {
+                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
+            })
             ->latest()
             ->take(5)
             ->get();

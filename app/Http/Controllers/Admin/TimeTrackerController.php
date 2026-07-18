@@ -119,10 +119,10 @@ class TimeTrackerController extends Controller
         $callback = function () use ($entries) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($file, ['תאריך', 'התחלה', 'סיום', 'משך', 'פרויקט', 'לקוח', 'משימה', 'תיאור']);
+            fputcsv($file, [__('csv_timer_date'), __('csv_timer_start'), __('csv_timer_end'), __('csv_timer_duration'), __('csv_timer_project'), __('csv_timer_client'), __('csv_timer_task'), __('csv_timer_desc')]);
 
             foreach ($entries as $e) {
-                $duration = $e->is_running ? 'רץ...' : $e->formatted_duration;
+                $duration = $e->is_running ? __('csv_running') : $e->formatted_duration;
                 fputcsv($file, [
                     $e->date->format('d/m/Y'),
                     $e->start_time->format('H:i'),
@@ -172,11 +172,11 @@ class TimeTrackerController extends Controller
             ->get();
 
         $totalMinutes = $entries->where('is_running', false)->sum('duration_minutes');
-        $totalHours = sprintf('%02d:%02d', floor($totalMinutes / 60), $totalMinutes % 60);
+        $totalDays = round($totalMinutes / 1440);
 
         $rows = '';
         foreach ($entries as $e) {
-            $duration = $e->is_running ? 'רץ...' : $e->formatted_duration;
+            $duration = $e->is_running ? __('csv_running') : $e->formatted_duration;
             $rows .= "<tr>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb'>" . e($e->date->format('d/m/Y')) . "</td>
                 <td style='padding:8px;border-bottom:1px solid #e5e7eb;font-family:monospace'>" . e($e->start_time->format('H:i')) . "</td>
@@ -201,12 +201,12 @@ class TimeTrackerController extends Controller
             th{background:#f3f4f6;padding:10px 8px;text-align:right;font-size:13px;color:#374151;border-bottom:2px solid #d1d5db}
             @media print{body{padding:20px}}
         </style></head><body>
-            <h1>' . e('דוח מעקב זמן') . '</h1>
-            <p class="subtitle">ForgeDesk Studio | ' . e('תאריך:') . ' ' . e($nowDate) . ' | ' . e('סה"כ רשומות:') . ' ' . e((string) $totalEntries) . '</p>
-            <div class="summary">' . e('סה"כ שעות:') . ' ' . e($totalHours) . '</div>
+            <h1>' . e(__('pdf_timer_report')) . '</h1>
+            <p class="subtitle">ForgeDesk Studio | ' . e(__('pdf_date')) . ' ' . e($nowDate) . ' | ' . e(__('pdf_total_entries')) . ' ' . e((string) $totalEntries) . '</p>
+            <div class="summary">' . e(__('pdf_total_hours')) . ' ' . e($totalDays) . ' days</div>
             <table>
                 <thead><tr>
-                    <th>' . e('תאריך') . '</th><th>' . e('התחלה') . '</th><th>' . e('סיום') . '</th><th>' . e('משך') . '</th><th>' . e('פרויקט') . '</th><th>' . e('לקוח') . '</th><th>' . e('משימה') . '</th><th>' . e('תיאור') . '</th>
+                    <th>' . e(__('csv_timer_date')) . '</th><th>' . e(__('csv_timer_start')) . '</th><th>' . e(__('csv_timer_end')) . '</th><th>' . e(__('csv_timer_duration')) . '</th><th>' . e(__('csv_timer_project')) . '</th><th>' . e(__('csv_timer_client')) . '</th><th>' . e(__('csv_timer_task')) . '</th><th>' . e(__('csv_timer_desc')) . '</th>
                 </tr></thead>
                 <tbody>' . $rows . '</tbody>
             </table>
@@ -227,7 +227,7 @@ class TimeTrackerController extends Controller
 
         $running = TimeEntry::forUser($userId)->running()->first();
         if ($running) {
-            return redirect()->route('admin.timetracker.index')->with('error', 'כבר יש טיימר רץ.');
+            return redirect()->route('admin.timetracker.index')->with('error', __('already_running'));
         }
 
         $validated = $request->validate([
@@ -246,7 +246,7 @@ class TimeTrackerController extends Controller
             'date' => Carbon::today(),
         ]);
 
-        return redirect()->route('admin.timetracker.index')->with('success', 'הטיימר הופעל.');
+        return redirect()->route('admin.timetracker.index')->with('success', __('timer_started'));
     }
 
     public function stop(TimeEntry $entry)
@@ -260,7 +260,7 @@ class TimeTrackerController extends Controller
             'is_running' => false,
         ]);
 
-        return redirect()->route('admin.timetracker.index')->with('success', 'הטיימר הופסק. משך: ' . $entry->fresh()->formatted_duration);
+        return redirect()->route('admin.timetracker.index')->with('success', __('timer_stopped') . ' ' . $entry->fresh()->formatted_duration);
     }
 
     public function destroy(TimeEntry $entry)
@@ -269,7 +269,7 @@ class TimeTrackerController extends Controller
 
         $entry->delete();
 
-        return redirect()->route('admin.timetracker.index')->with('success', 'הרשומה נמחקה.');
+        return redirect()->route('admin.timetracker.index')->with('success', __('entry_deleted'));
     }
 
     public function store(Request $request)
@@ -299,7 +299,7 @@ class TimeTrackerController extends Controller
             'date' => $validated['date'],
         ]);
 
-        return redirect()->route('admin.timetracker.index')->with('success', 'הרשומה נוספה ידנית.');
+        return redirect()->route('admin.timetracker.index')->with('success', __('entry_added'));
     }
 
     public function getTasks($projectId)
@@ -348,7 +348,7 @@ class TimeTrackerController extends Controller
             'date' => $validated['date'],
         ]);
 
-        return redirect()->route('admin.timetracker.index')->with('success', 'הרשומה עודכנה.');
+        return redirect()->route('admin.timetracker.index')->with('success', __('entry_updated'));
     }
 
     private function managedProjectRule(): \Closure
@@ -359,7 +359,7 @@ class TimeTrackerController extends Controller
             }
             $project = Project::find($value);
             if (! $project || $project->user?->admin_id !== auth()->id()) {
-                $fail('הפרויקט שנבחר אינו זמין.');
+                $fail(__('invalid_project'));
             }
         };
     }
@@ -372,7 +372,7 @@ class TimeTrackerController extends Controller
             }
             $task = Task::find($value);
             if (! $task || ! $projectId || $task->project_id != $projectId) {
-                $fail('המשימה שנבחרה אינה תקינה.');
+                $fail(__('invalid_task'));
             }
         };
     }

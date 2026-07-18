@@ -1,24 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'לקוחות - מנהל')
+@section('title', __('clients_list'))
 @section('breadcrumbs')
 <nav class="flex items-center gap-2 text-sm">
-    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">בית</a>
+    <a href="{{ route('admin.dashboard') }}" class="text-ink-muted hover:text-accent transition">{{ __('home') }}</a>
     <i data-lucide="chevron-left" class="w-3.5 h-3.5 text-ink-muted"></i>
-    <span class="text-ink font-medium">לקוחות</span>
+    <span class="text-ink font-medium">{{ __('clients') }}</span>
 </nav>
 @endsection
 
 @section('actions')
 <a href="{{ route('admin.clients.create') }}" class="btn-primary">
-    + לקוח חדש
+    + {{ __('new_client') }}
 </a>
 @endsection
 
 @section('content')
 <div class="bg-white rounded-card border border-border shadow-card overflow-hidden">
     <div class="px-6 py-5 border-b border-border">
-        <h2 class="text-lg font-semibold text-ink">רשימת לקוחות</h2>
+        <h2 class="text-lg font-semibold text-ink">{{ __('clients_list') }}</h2>
     </div>
 
     {{-- Desktop table --}}
@@ -26,13 +26,13 @@
         <table class="w-full text-right">
             <thead>
                 <tr class="border-b border-border">
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">שם</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">דוא"ל</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">טלפון</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">חברה</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">פרויקטים</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">סטטוס</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">פעולה</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('name') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('email') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('phone') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('company') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('projects') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('status') }}</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">{{ __('actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border">
@@ -50,13 +50,13 @@
                         <td class="px-6 py-4 text-ink-secondary">{{ $client->projects_count }}</td>
                         <td class="px-6 py-4">
                             @if($client->is_active)
-                                <span class="rounded-badge px-3 py-1 text-xs font-medium bg-green-100 text-green-800">פעיל</span>
+                                <span class="rounded-badge px-3 py-1 text-xs font-medium bg-green-100 text-green-800">{{ __('active') }}</span>
                             @else
-                                <span class="rounded-badge px-3 py-1 text-xs font-medium bg-red-100 text-red-800">מושבת</span>
+                                <span class="rounded-badge px-3 py-1 text-xs font-medium bg-red-100 text-red-800">{{ __('inactive') }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4" onclick="event.stopPropagation()">
-                            <a href="{{ route('admin.clients.edit', $client) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition">עריכה</a>
+                            <a href="{{ route('admin.clients.edit', $client) }}" class="text-ink-secondary hover:text-ink text-sm font-medium transition">{{ __('edit') }}</a>
                         </td>
                     </tr>
                 @empty
@@ -64,7 +64,7 @@
                         <td colspan="7" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <i data-lucide="users" class="w-10 h-10 text-ink-muted/40"></i>
-                                <p class="text-ink-muted text-sm">אין לקוחות עדיין.</p>
+                                <p class="text-ink-muted text-sm">{{ __('no_clients') }}</p>
                             </div>
                         </td>
                     </tr>
@@ -86,41 +86,43 @@
                         </div>
                     </div>
                     @if($client->is_active)
-                        <span class="rounded-badge px-2.5 py-1 text-xs font-medium bg-green-100 text-green-800 whitespace-nowrap">פעיל</span>
+                        <span class="rounded-badge px-2.5 py-1 text-xs font-medium bg-green-100 text-green-800 whitespace-nowrap">{{ __('active') }}</span>
                     @else
-                        <span class="rounded-badge px-2.5 py-1 text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">מושבת</span>
+                        <span class="rounded-badge px-2.5 py-1 text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">{{ __('inactive') }}</span>
                     @endif
                 </div>
                 <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mb-3">
                     <div>
-                        <span class="text-ink-muted text-xs">טלפון</span>
+                        <span class="text-ink-muted text-xs">{{ __('phone') }}</span>
                         <p class="text-ink-secondary">{{ $client->phone ?? '-' }}</p>
                     </div>
                     <div>
-                        <span class="text-ink-muted text-xs">חברה</span>
+                        <span class="text-ink-muted text-xs">{{ __('company') }}</span>
                         <p class="text-ink-secondary">{{ $client->company ?? '-' }}</p>
                     </div>
                     <div>
-                        <span class="text-ink-muted text-xs">פרויקטים</span>
+                        <span class="text-ink-muted text-xs">{{ __('projects') }}</span>
                         <p class="text-ink-secondary">{{ $client->projects_count }}</p>
                     </div>
                 </div>
                 <div class="flex items-center justify-end">
-                    <span class="text-sm text-ink-secondary font-medium transition">עריכה</span>
+                    <span class="text-sm text-ink-secondary font-medium transition">{{ __('edit') }}</span>
                 </div>
             </a>
         @empty
             <div class="px-6 py-16 text-center">
                 <div class="flex flex-col items-center gap-2">
                     <i data-lucide="users" class="w-10 h-10 text-ink-muted/40"></i>
-                    <p class="text-ink-muted text-sm">אין לקוחות עדיין.</p>
+                    <p class="text-ink-muted text-sm">{{ __('no_clients') }}</p>
                 </div>
             </div>
         @endforelse
     </div>
 
+    @if($clients->hasPages())
     <div class="px-6 py-4 border-t border-border">
         {{ $clients->links() }}
     </div>
+    @endif
 </div>
 @endsection

@@ -58,17 +58,22 @@ class AuthorizationTest extends TestCase
 
     public function test_login_rate_limiting_blocks_repeated_attempts(): void
     {
+        config(['cache.store' => 'file']);
+        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+
         User::factory()->create(['email' => 'test@example.com', 'password' => Hash::make('correct')]);
 
-        for ($i = 0; $i < 5; $i++) {
-            $this->post(route('login'), ['email' => 'test@example.com', 'password' => 'wrong']);
+        for ($i = 0; $i < 10; $i++) {
+            $this->post(route('login'), [
+                'email' => 'test@example.com',
+                'password' => 'wrong',
+            ]);
         }
 
-        $response = $this->post(route('login'), ['email' => 'test@example.com', 'password' => 'wrong']);
-
-        if ($response->status() === 419) {
-            $this->markTestSkipped('CSRF protection interfered with rate-limiting test (SESSION_DRIVER=array in testing). Rate limiting works correctly in production.');
-        }
+        $response = $this->post(route('login'), [
+            'email' => 'test@example.com',
+            'password' => 'wrong',
+        ]);
 
         $response->assertStatus(429);
     }
