@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('forgot_password') }} - {{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}</title>
+    @php $logo = \App\Models\Setting::get('app_logo'); @endphp
+    @if($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo))
+        <link rel="icon" type="image/png" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}">
+    @endif
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2317C3B2'/><text x='50%25' y='70%25' text-anchor='middle' fill='white' font-size='20' font-weight='bold' font-family='sans-serif'>F</text></svg>"
     <link rel="stylesheet" href="/css/app.css">
     <script>
         (function() {
@@ -38,9 +43,13 @@
     <div class="w-full max-w-md px-4">
         <div class="rounded-card border shadow-card p-8 transition-colors" style="background:var(--color-card); border-color:var(--color-border);">
             <div class="text-center mb-8">
-                <div class="w-12 h-12 rounded-card flex items-center justify-center mx-auto mb-4" style="background:var(--color-accent-light);">
-                    <i data-lucide="hexagon" class="w-6 h-6 text-accent"></i>
-                </div>
+                @if($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo))
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}" alt="Logo" class="w-16 h-16 object-contain mx-auto mb-4">
+                @else
+                    <div class="w-12 h-12 rounded-card flex items-center justify-center mx-auto mb-4" style="background:var(--color-accent-light);">
+                        <i data-lucide="hexagon" class="w-6 h-6 text-accent"></i>
+                    </div>
+                @endif
                 <h1 class="text-2xl font-bold" style="color:var(--color-ink);">{{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}</h1>
                 <p class="mt-1.5 text-sm" style="color:var(--color-ink-secondary);">{{ __('forgot_password_title') }}</p>
             </div>
