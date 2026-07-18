@@ -15,11 +15,6 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        if (app()->environment('production')) {
-            $this->command?->warn('Seeder is disabled in production. Create users through the application UI.');
-            return;
-        }
-
         $adminPassword = 'admin123456';
         $clientPassword = 'client123456';
 
