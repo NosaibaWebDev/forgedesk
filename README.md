@@ -28,52 +28,17 @@ git clone https://github.com/NosaibaWebDev/forgedesk.git
 cd forgedesk
 
 composer install
+
 cp .env.example .env
 php artisan key:generate
 
 # Edit .env with your database credentials
+
 php artisan migrate
 php artisan db:seed
+php artisan app:create-admin
 
 # For production
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-```
-
-**Requirements:** PHP 8.2 or later, Composer, MySQL 8+ or SQLite
-
-## Default Credentials
-
-After running `php artisan db:seed`, you can log in with:
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@forgedesk.dev | admin123456 |
-| Client | client@forgedesk.dev | client123456 |
-
-**Change these immediately after first login.**
-
----
-
-## Built With
-
-- Laravel 12
-- Tailwind CSS
-- Alpine.js
-- Lucide Icons
-- SQLite / MySQL
-
----
-
-## License
-
-This project is open source. You are free to use, modify, and distribute it however you wish. No restrictions, no obligations.
-
----
-
-**https://nosaiba.com**
-
----
-
-> **Note:** This README was written by AI. The entire project, from architecture and UI to translations and security hardening, was built using vibe coding — iterating with AI to design, code, audit, and refine every detail.
