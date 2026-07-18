@@ -7,7 +7,7 @@
     <title>{{ __('login') }} - {{ \App\Models\Setting::get('app_name', 'ForgeDesk Studio') }}</title>
     @php $logo = \App\Models\Setting::get('app_logo'); @endphp
     @if($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo))
-        <link rel="icon" type="image/png" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}">
+        <link rel="icon" type="image/png" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}?v={{ \Illuminate\Support\Facades\Storage::disk('public')->lastModified($logo) }}">
     @endif
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2317C3B2'/><text x='50%25' y='70%25' text-anchor='middle' fill='white' font-size='20' font-weight='bold' font-family='sans-serif'>F</text></svg>">
     <link rel="stylesheet" href="/css/app.css">
