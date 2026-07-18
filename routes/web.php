@@ -50,7 +50,7 @@ Route::post('/forgot-password', function (\Illuminate\Http\Request $request) {
     return $status === Password::RESET_LINK_SENT
         ? back()->with('status', __($status))
         : back()->withErrors(['email' => __($status)]);
-})->middleware('throttle:login');
+})->middleware('throttle:login')->name('password.email');
 
 Route::get('/reset-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token, 'email' => request()->email ?? '']);
