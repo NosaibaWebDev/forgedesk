@@ -391,5 +391,6 @@
   "auth.access_denied": "אין לך גישה לאזור זה.",
   "auth.account_disabled": "החשבון שלך הושבת. אנא פנה למנהל.",
   "timer_already_stopped": "הטיימר כבר הופסק.",
-  "auth.password_incorrect": "הסיסמה אינה נכונה."
+  "auth.password_incorrect": "הסיסמה אינה נכונה.",
+  "language_changed": "השפה שונתה בהצלחה."
 }

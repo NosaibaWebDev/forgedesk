@@ -20,8 +20,11 @@ class LanguageController extends Controller
             session(['preferred_language' => $locale]);
         }
 
-        app()->setLocale($locale);
+        $fallback = '/';
+        if (Auth::check()) {
+            $fallback = Auth::user()->isAdmin() ? route('admin.dashboard') : route('client.dashboard');
+        }
 
-        return redirect()->back()->with('success', $locale === 'he' ? 'שפה שונתה לעברית' : 'تم تغيير اللغة إلى العربية');
+        return redirect()->to(url()->previous($fallback))->with('success', __('language_changed'));
     }
 }

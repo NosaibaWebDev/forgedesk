@@ -391,5 +391,6 @@
   "auth.access_denied": "ليس لديك صلاحية للوصول إلى هذه المنطقة.",
   "auth.account_disabled": "تم تعطيل حسابك. يرجى الاتصال بالمسؤول.",
   "timer_already_stopped": "تم إيقاف المؤقت بالفعل.",
-  "auth.password_incorrect": "كلمة المرور غير صحيحة."
+  "auth.password_incorrect": "كلمة المرور غير صحيحة.",
+  "language_changed": "تم تغيير اللغة بنجاح."
 }
