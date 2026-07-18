@@ -20,14 +20,17 @@ class ProfileController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('avatar')) {
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
+            try {
+                if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+                $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            } catch (\Exception $e) {
+                return back()->withInput()->with('error', __('avatar_upload_failed'));
             }
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
-        $user->update($validated);
-        Auth::setUser($user->fresh());
+        $user->forceFill($validated)->save();
 
         return redirect()->route('profile.edit')->with('success', __('profile_updated'));
     }
