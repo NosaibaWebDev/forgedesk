@@ -23,27 +23,31 @@ class DatabaseSeeder extends Seeder
         $this->command?->warn("Client: client@forgedesk.dev / client123456");
         $this->command?->warn('=====================================================');
 
-        $admin = User::create([
-            'name' => 'מנהל המערכת',
-            'email' => 'admin@forgedesk.dev',
-            'password' => Hash::make($adminPassword),
-            'role' => 'admin',
-            'phone' => '050-1234567',
-            'company' => 'ForgeDesk Studio',
-            'is_active' => true,
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@forgedesk.dev'],
+            [
+                'name' => 'מנהל המערכת',
+                'password' => Hash::make($adminPassword),
+                'role' => 'admin',
+                'phone' => '050-1234567',
+                'company' => 'ForgeDesk Studio',
+                'is_active' => true,
+            ]
+        );
 
-        $client = User::create([
-            'name' => 'לקוח לדוגמה',
-            'email' => 'client@forgedesk.dev',
-            'password' => Hash::make($clientPassword),
-            'role' => 'client',
-            'admin_id' => $admin->id,
-            'phone' => '052-7654321',
-            'company' => 'חברת דוגמה בע"מ',
-            'address' => 'רחוב הרצל 1, תל אביב',
-            'is_active' => true,
-        ]);
+        $client = User::firstOrCreate(
+            ['email' => 'client@forgedesk.dev'],
+            [
+                'name' => 'לקוח לדוגמה',
+                'password' => Hash::make($clientPassword),
+                'role' => 'client',
+                'admin_id' => $admin->id,
+                'phone' => '052-7654321',
+                'company' => 'חברת דוגמה בע"מ',
+                'address' => 'רחוב הרצל 1, תל אביב',
+                'is_active' => true,
+            ]
+        );
 
         $project = Project::create([
             'user_id' => $client->id,
@@ -163,32 +167,38 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($clients as $data) {
-            $client = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make('client123456'),
-                'role' => 'client',
-                'admin_id' => $admin->id,
-                'phone' => $data['phone'],
-                'company' => $data['company'],
-                'is_active' => true,
-            ]);
+            $this->command?->info("Seeding: {$data['name']}");
+
+            $client = User::firstOrCreate(
+                ['email' => $data['email']],
+                [
+                    'name' => $data['name'],
+                    'password' => Hash::make('client123456'),
+                    'role' => 'client',
+                    'admin_id' => $admin->id,
+                    'phone' => $data['phone'],
+                    'company' => $data['company'],
+                    'is_active' => true,
+                ]
+            );
 
             $projects = $projectsData[$data['type']] ?? [];
             foreach ($projects as $i => $p) {
-                $project = Project::create([
-                    'user_id' => $client->id,
-                    'title' => $p['title'],
-                    'description' => 'פרויקט ' . $p['title'] . ' - כולל ליווי מלא משלב האפיון ועד ההשקה.',
-                    'status' => $p['status'],
-                    'priority' => $p['priority'],
-                    'budget' => $p['budget'],
-                    'paid_amount' => $p['paid'],
-                    'hourly_rate' => rand(150, 300),
-                    'estimated_hours' => collect($taskTemplates)->sum('estimated'),
-                    'start_date' => now()->subDays(rand(5, 30)),
-                    'due_date' => now()->addDays(rand(14, 90)),
-                ]);
+                $project = Project::firstOrCreate(
+                    ['title' => $p['title'], 'user_id' => $client->id],
+                    [
+                        'description' => 'פרויקט ' . $p['title'] . ' - כולל ליווי מלא משלב האפיון ועד ההשקה.',
+                        'status' => $p['status'],
+                        'priority' => $p['priority'],
+                        'budget' => $p['budget'],
+                        'paid_amount' => $p['paid'],
+                        'hourly_rate' => rand(150, 300),
+                        'estimated_hours' => collect($taskTemplates)->sum('estimated'),
+                        'start_date' => now()->subDays(rand(5, 30)),
+                        'due_date' => now()->addDays(rand(14, 90)),
+                    ]
+                );
+                $this->command?->info("  Project: {$p['title']}");
 
                 foreach ($taskTemplates as $j => $task) {
                     $taskStatus = $p['status'] === 'completed' ? 'completed' : $task['status'];
@@ -198,17 +208,18 @@ class DatabaseSeeder extends Seeder
                         $taskStatus = 'in_progress';
                     }
 
-                    Task::create([
-                        'project_id' => $project->id,
-                        'assigned_to' => $admin->id,
-                        'title' => $task['title'],
-                        'description' => 'ביצוע ' . $task['title'] . ' עבור ' . $p['title'],
-                        'status' => $taskStatus,
-                        'priority' => $j < 2 ? 'high' : 'medium',
-                        'estimated_hours' => $task['estimated'],
-                        'actual_hours' => $taskStatus === 'completed' ? ($task['estimated'] - rand(0, 2)) : null,
-                        'due_date' => $j === 0 ? now()->addDays(7) : now()->addDays(14 * ($j + 1)),
-                    ]);
+                    Task::firstOrCreate(
+                        ['title' => $task['title'], 'project_id' => $project->id],
+                        [
+                            'assigned_to' => $admin->id,
+                            'description' => 'ביצוע ' . $task['title'] . ' עבור ' . $p['title'],
+                            'status' => $taskStatus,
+                            'priority' => $j < 2 ? 'high' : 'medium',
+                            'estimated_hours' => $task['estimated'],
+                            'actual_hours' => $taskStatus === 'completed' ? ($task['estimated'] - rand(0, 2)) : null,
+                            'due_date' => $j === 0 ? now()->addDays(7) : now()->addDays(14 * ($j + 1)),
+                        ]
+                    );
                 }
             }
         }
