@@ -12,10 +12,11 @@
         $logo = \App\Models\Setting::get('app_logo');
     @endphp
     @if($logo && \Illuminate\Support\Facades\Storage::disk('public')->exists($logo))
-        <link rel="icon" type="image/png" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}?v={{ \Illuminate\Support\Facades\Storage::disk('public')->lastModified($logo) }}">
-        <link rel="apple-touch-icon" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($logo) }}">
+        <link rel="icon" type="image/png" href="{{ asset('storage/' . $logo) }}">
+        <link rel="apple-touch-icon" href="{{ asset('storage/' . $logo) }}">
+    @else
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2317C3B2'/><text x='50%25' y='70%25' text-anchor='middle' fill='white' font-size='20' font-weight='bold' font-family='sans-serif'>F</text></svg>">
     @endif
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2317C3B2'/><text x='50%25' y='70%25' text-anchor='middle' fill='white' font-size='20' font-weight='bold' font-family='sans-serif'>F</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
